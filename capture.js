@@ -2,120 +2,123 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 
 const hour = process.argv[2];
-const isUSTime  = (hour === '7' || hour === '07' || hour === 'all' || hour === 'manual');
-const isKRTime  = (hour === '16' || hour === 'all' || hour === 'manual');
+const isUSTime = (hour === '7' || hour === '07' || hour === 'all' || hour === 'manual');
+const isKRTime = (hour === '16' || hour === 'all' || hour === 'manual');
 
-// ── 캡처 대상 설정 ──────────────────────────────────────────
 const CAPTURES = [
   {
     id: 'sp500',
     name: 'S&P 500',
-    // Finviz 히트맵 직접 이미지 URL (Canvas 렌더링 없이 PNG 제공)
-    url: 'https://finviz.com/map.ashx?t=sec&mn=snp500&o=-perf1d&width=1600&height=800',
-    isImage: true,   // 페이지 캡처 대신 이미지 URL 직접 다운로드
+    url: 'https://finviz.com/map.ashx?t=sec&mn=snp500&o=-perf1d',
+    isImage: false,
+    waitMs: 8000,
+    // 히트맵 캔버스 요소만 크롭해서 저장
+    selector: '#mapcanvas',
+    viewport: { width: 1800, height: 900 },
     output: 'images/heatmap_sp500.png',
     runAt: 'US',
   },
   {
     id: 'nasdaq',
     name: 'Nasdaq 100',
-    url: 'https://finviz.com/map.ashx?t=sec_ndx&o=-perf1d&width=1600&height=800',
-    isImage: true,
+    url: 'https://finviz.com/map.ashx?t=sec_ndx&o=-perf1d',
+    isImage: false,
+    waitMs: 8000,
+    selector: '#mapcanvas',
+    viewport: { width: 1800, height: 900 },
     output: 'images/heatmap_nasdaq.png',
     runAt: 'US',
   },
   {
     id: 'kospi',
     name: '코스피',
-    // 네이버 증권 코스피 시가총액 맵 (스크린샷 방식)
     url: 'https://markets.hankyung.com/heatmap/kospi',
     isImage: false,
-    selector: '.heatmap-wrap',
-    waitMs: 8000,
+    waitMs: 9000,
+    selector: null,
+    viewport: { width: 1600, height: 900 },
     output: 'images/heatmap_kospi.png',
     runAt: 'KR',
   },
 ];
 
-// ── 이미지 URL 직접 다운로드 ──────────────────────────────
-async function downloadImage(config, context) {
-  console.log(`\n📥 [${config.name}] 이미지 직접 다운로드...`);
+async function captureTarget(config, browser) {
+  console.log(`\n📸 [${config.name}] 캡처 시작...`);
   console.log(`   URL: ${config.url}`);
 
+  // 각 캡처마다 뷰포트 크기를 개별 설정
+  const context = await browser.newContext({
+    viewport: config.viewport || { width: 1800, height: 900 },
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    locale: 'ko-KR',
+    timezoneId: 'Asia/Seoul',
+  });
+
   const page = await context.newPage();
+
   try {
-    const response = await page.request.get(config.url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        'Referer': 'https://finviz.com/',
-        'Accept': 'image/png,image/webp,*/*',
-      },
-      timeout: 30000,
+    await page.goto(config.url, { waitUntil: 'domcontentloaded', timeout: 40000 });
+
+    // 광고/팝업 닫기 시도
+    try {
+      await page.keyboard.press('Escape');
+    } catch (_) {}
+
+    // 렌더링 대기
+    await page.waitForTimeout(config.waitMs);
+
+    // 스크롤바 숨기기 (깔끔한 캡처)
+    await page.addStyleTag({
+      content: `
+        ::-webkit-scrollbar { display: none !important; }
+        * { scrollbar-width: none !important; }
+        .header, nav, footer, .ad, [class*="banner"], [class*="popup"], [id*="popup"] {
+          display: none !important;
+        }
+      `
     });
-
-    if (!response.ok()) {
-      throw new Error(`HTTP ${response.status()} ${response.statusText()}`);
-    }
-
-    const contentType = response.headers()['content-type'] || '';
-    if (!contentType.includes('image')) {
-      throw new Error(`예상치 못한 Content-Type: ${contentType}`);
-    }
-
-    const buffer = await response.body();
-    fs.writeFileSync(config.output, buffer);
-
-    const stats = fs.statSync(config.output);
-    console.log(`   ✅ 저장 완료: ${config.output} (${(stats.size / 1024).toFixed(1)} KB)`);
-    return true;
-
-  } catch (err) {
-    console.error(`   ❌ 다운로드 실패: ${err.message}`);
-    return false;
-  } finally {
-    await page.close();
-  }
-}
-
-// ── 페이지 스크린샷 방식 ──────────────────────────────────
-async function captureScreenshot(config, context) {
-  console.log(`\n📸 [${config.name}] 스크린샷 캡처...`);
-  console.log(`   URL: ${config.url}`);
-
-  const page = await context.newPage();
-  try {
-    await page.goto(config.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await page.waitForTimeout(config.waitMs || 5000);
 
     let element = null;
     if (config.selector) {
       try {
-        element = await page.waitForSelector(config.selector, { timeout: 8000 });
+        element = await page.waitForSelector(config.selector, { timeout: 10000 });
+        console.log(`   ✅ 선택자 발견: ${config.selector}`);
       } catch {
-        console.log(`   ⚠️  선택자 없음, 전체 화면 캡처`);
+        console.log(`   ⚠️  선택자 없음 → 전체 화면 캡처`);
       }
     }
 
-    const opts = { path: config.output, type: 'png', fullPage: false };
     if (element) {
-      await element.screenshot(opts);
+      // 요소 크기 확인
+      const box = await element.boundingBox();
+      console.log(`   📐 요소 크기: ${Math.round(box.width)}×${Math.round(box.height)}`);
+
+      // 요소만 캡처 (잘림 없음)
+      await element.screenshot({
+        path: config.output,
+        type: 'png',
+      });
     } else {
-      await page.screenshot(opts);
+      // 전체 화면 캡처
+      await page.screenshot({
+        path: config.output,
+        type: 'png',
+        fullPage: false,
+      });
     }
 
     const stats = fs.statSync(config.output);
-    console.log(`   ✅ 저장 완료: ${config.output} (${(stats.size / 1024).toFixed(1)} KB)`);
+    console.log(`   ✅ 저장: ${config.output} (${(stats.size / 1024).toFixed(1)} KB)`);
     return true;
 
   } catch (err) {
-    console.error(`   ❌ 스크린샷 실패: ${err.message}`);
+    console.error(`   ❌ 실패: ${err.message}`);
     return false;
   } finally {
-    await page.close();
+    await context.close();
   }
 }
 
-// ── 메인 실행 ─────────────────────────────────────────────
 (async () => {
   console.log('🚀 히트맵 캡처 시작');
   console.log(`   hour=${hour} | US장=${isUSTime} | KR장=${isKRTime}`);
@@ -136,37 +139,17 @@ async function captureScreenshot(config, context) {
       '--disable-setuid-sandbox',
       '--disable-dev-shm-usage',
       '--disable-gpu',
+      '--window-size=1800,900',
     ],
   });
 
-  const context = await browser.newContext({
-    viewport: { width: 1600, height: 800 },
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    locale: 'ko-KR',
-    timezoneId: 'Asia/Seoul',
-  });
-
   let successCount = 0;
-
   for (const config of targets) {
-    let ok = false;
-    if (config.isImage) {
-      ok = await downloadImage(config, context);
-      // 직접 다운로드 실패 시 스크린샷으로 재시도
-      if (!ok) {
-        console.log(`   🔄 스크린샷 방식으로 재시도...`);
-        ok = await captureScreenshot({ ...config, isImage: false, waitMs: 6000 }, context);
-      }
-    } else {
-      ok = await captureScreenshot(config, context);
-    }
+    const ok = await captureTarget(config, browser);
     if (ok) successCount++;
   }
 
   await browser.close();
-
   console.log(`\n🏁 완료: ${successCount}/${targets.length} 성공`);
-
-  // 1개 이상 성공하면 exit 0 (전체 실패 시에만 워크플로우 실패로 표시)
   process.exit(successCount > 0 ? 0 : 1);
 })();
