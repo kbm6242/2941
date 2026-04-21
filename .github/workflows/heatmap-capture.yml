@@ -1,0 +1,59 @@
+name: 히트맵 자동 캡처
+
+on:
+  schedule:
+    # KST 07:00 = UTC 22:00 (전날) — 미국장 마감 후 S&P500 / 나스닥
+    - cron: '0 22 * * 0-4'
+    # KST 16:00 = UTC 07:00 — 한국장 마감 후 코스피
+    - cron: '0 7 * * 1-5'
+  workflow_dispatch:  # 수동 실행 버튼도 활성화
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # 이미지 파일을 저장소에 push 하기 위한 권한
+
+    steps:
+      # 1. 저장소 코드 가져오기
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
+
+      # 2. Node.js 설치
+      - name: Node.js 설치
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 3. Playwright 설치
+      - name: Playwright 설치
+        run: |
+          npm init -y
+          npm install playwright
+          npx playwright install chromium --with-deps
+
+      # 4. 이미지 저장 폴더 생성
+      - name: images 폴더 생성
+        run: mkdir -p images
+
+      # 5. 현재 시각 확인 (KST 기준)
+      - name: 현재 KST 시각 확인
+        id: kst
+        run: |
+          KST_HOUR=$(TZ='Asia/Seoul' date +%H)
+          echo "kst_hour=$KST_HOUR" >> $GITHUB_OUTPUT
+          echo "현재 KST 시각: $(TZ='Asia/Seoul' date)"
+
+      # 6. 스크린샷 캡처 스크립트 실행
+      - name: 히트맵 캡처
+        run: node capture.js ${{ steps.kst.outputs.kst_hour }}
+
+      # 7. 변경된 이미지 파일 커밋 & 푸시
+      - name: 이미지 커밋 및 푸시
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add images/
+          # 변경사항이 있을 때만 커밋
+          git diff --staged --quiet || git commit -m "🗺️ 히트맵 자동 업데이트 $(TZ='Asia/Seoul' date '+%Y-%m-%d %H:%M KST')"
+          git push
