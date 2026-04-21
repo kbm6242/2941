@@ -19,7 +19,7 @@ const CAPTURES = [
   {
     id: 'nasdaq',
     name: 'Nasdaq 100',
-    url: 'https://finviz.com/map.ashx?t=sec_etf&mn=nasdaq&o=-perf1d&width=1600&height=800',
+    url: 'https://finviz.com/map.ashx?t=sec_ndx&o=-perf1d&width=1600&height=800',
     isImage: true,
     output: 'images/heatmap_nasdaq.png',
     runAt: 'US',
@@ -28,10 +28,10 @@ const CAPTURES = [
     id: 'kospi',
     name: '코스피',
     // 네이버 증권 코스피 시가총액 맵 (스크린샷 방식)
-    url: 'https://finance.naver.com/sise/sise_group.naver?type=upjong',
+    url: 'https://markets.hankyung.com/heatmap/kospi',
     isImage: false,
-    selector: null,
-    waitMs: 7000,
+    selector: '.heatmap-wrap',
+    waitMs: 8000,
     output: 'images/heatmap_kospi.png',
     runAt: 'KR',
   },
