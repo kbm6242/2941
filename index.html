@@ -224,9 +224,9 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
 .port-donut-lead-sub{font-size:11px;color:var(--text-muted);margin-top:3px;}
 .port-donut-list{display:flex;flex-direction:column;gap:5px;flex:1;overflow-y:auto;}
 .port-donut-item{display:flex;align-items:center;gap:8px;padding:3px 0;}
-.port-donut-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.port-donut-item-name{flex:1;font-size:11px;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.port-donut-item-pct{font-size:12px;font-weight:700;color:var(--text-main);font-family:'DM Mono',monospace;white-space:nowrap;}
+.port-donut-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.port-donut-item-name{flex:1;font-size:13px;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.port-donut-item-pct{font-size:14px;font-weight:700;color:var(--text-main);font-family:'DM Mono',monospace;white-space:nowrap;}
 @media(max-width:860px){.port-donut-panel{flex:unset!important;width:100%;min-width:0;}[id='port-heatmap-wrap']{flex:unset!important;width:100%;}}
 .port-hm-cell{}
 .port-hm-cell:hover{filter:brightness(1.08);}
@@ -513,7 +513,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
       <div class="hm-tab" id="phtab-san"  onclick="switchPortHeatmap('san')">🔵 산이계좌</div>
       <div class="hm-tab" id="phtab-boy"  onclick="switchPortHeatmap('boy')">🩷 보연씌계좌</div>
     </div>
-    <div style="display:flex;gap:16px;align-items:stretch;">
+    <div style="display:flex;gap:16px;align-items:flex-start;">
       <div id="port-heatmap-wrap" style="flex:7;min-width:0;height:100%;"></div>
       <!-- 비중 도넛차트 패널 -->
       <div class="port-donut-panel" id="port-donut-panel" style="flex:3;width:auto;">
@@ -1444,7 +1444,7 @@ function switchHoldings(type,el){
   setEl('page-title',titles[type]||'종목현황');
   if(type==='all') renderHoldingsAll();
   else if(type==='div') renderHoldingsDiv();
-  else if(type==='heatmap') renderPortDonut(currentPortHmTab||'all');requestAnimationFrame(function(){renderPortHeatmap(currentPortHmTab||'all');});
+  else if(type==='heatmap'){renderPortDonut(currentPortHmTab||'all');requestAnimationFrame(function(){renderPortHeatmap(currentPortHmTab||'all');});}
 }
 function setYear(y,btn){
   currentYear=y;
@@ -1480,6 +1480,7 @@ function switchPortHeatmap(tab){
 //  보유종목 비중 도넛차트
 // ══════════════════════════════════════════
 let portDonutChart = null;
+let portHmHMap = {all:0,nae:0,san:0,boy:0}; // 탭별 히트맵 높이 고정
 const DONUT_COLORS = [
   '#38bdf8','#f59e0b','#a78bfa','#f472b6','#34d399',
   '#fb923c','#60a5fa','#e879f9','#facc15','#4ade80',
@@ -1492,8 +1493,14 @@ function renderPortDonut(tab){
   for(var si=0;si<HOLDINGS_ALL.length;si++){
     var sec = HOLDINGS_ALL[si];
     if(tab!=='all'){
-      var accMap = {nae:'내계좌',san:'산이계좌',boy:'보연씌계좌'};
-      if(sec.acc !== accMap[tab]) continue;
+      // 히트맵 accGroup과 동일하게 그룹 매핑
+      var accG = (function(acc){
+        if(acc==='내계좌'||acc==='증여예정'||acc==='연금계좌') return 'nae';
+        if((acc||'').indexOf('산이')>=0) return 'san';
+        if((acc||'').indexOf('보연씌')>=0) return 'boy';
+        return 'etc';
+      })(sec.acc);
+      if(accG !== tab) continue;
     }
     for(var ii=0;ii<sec.items.length;ii++){
       var item = sec.items[ii];
@@ -1634,8 +1641,14 @@ function renderPortHeatmap(tab){
 
   // 5. Squarified Treemap — iterative (빈공간/겹침 없음)
   var W=Math.min(1100, Math.round((wrap.clientWidth||860)*0.98));
-  // 도넛 패널과 높이 맞춤: wrap.clientHeight 우선, 없으면 W*0.38
-  var H=wrap.clientHeight>100?wrap.clientHeight:Math.round(W*0.38);
+  // 도넛 패널 높이를 기준으로 H 고정 (wrap은 히트맵이 그려지면 늘어나므로 사용 X)
+  // H: 탭별 최초 1회 도넛 자연높이 기준 계산 후 고정
+  if(!portHmHMap[tab]){
+    var donutPanel=document.getElementById('port-donut-panel');
+    var naturalH=donutPanel?donutPanel.scrollHeight:0;
+    portHmHMap[tab]=naturalH>100?naturalH:Math.round(W*0.45);
+  }
+  var H=portHmHMap[tab];
   var totalEval=0;
   for(var i=0;i<rows.length;i++) totalEval+=rows[i].evalAmt;
   if(!totalEval) totalEval=1;
@@ -1752,8 +1765,9 @@ function renderPortHeatmap(tab){
     var bw=Math.max(1,r.w-GAP*2);
     var bh=Math.max(1,r.h-GAP*2);
     var minDim=Math.min(bw,bh);
-    var fs1=Math.min(15,Math.max(9,minDim*0.18));
-    var fs2=Math.min(12,Math.max(8,minDim*0.13));
+    var fs1=Math.min(32,Math.max(9,minDim*0.22));   // 박스 크기에 비례, 최대 32px
+    var fs2=Math.min(22,Math.max(8,minDim*0.15));   // 수익률
+    var fs3=Math.min(16,Math.max(7,minDim*0.11));   // 평가금액
     var showName=(minDim>30);
     var showRate=(minDim>24);
     var showAmt=(minDim>58);
@@ -1803,6 +1817,9 @@ function renderPortHeatmap(tab){
     +'margin:0 auto;">'
     +cellsHtml
     +'</div>';
+  // wrap 높이를 H+legend높이로 명시 고정 (재진입 시 DOM 팽창 방지)
+  wrap.style.height = (H + 36) + 'px';
+  wrap.style.overflow = 'hidden';
 }
 
 // ══════════════════════════════════════════
@@ -1824,6 +1841,14 @@ setInterval(()=>{
 renderTrend();renderDividend();renderHoldingsAll();renderHoldingsDiv();
 initGoalInputs();
 loadAllSheetData();
+// 화면 리사이즈 시 히트맵 높이 재계산
+window.addEventListener('resize', function(){
+  portHmHMap = {all:0,nae:0,san:0,boy:0};
+  if(document.getElementById('port-donut-panel')){
+    renderPortDonut(currentPortHmTab||'all');
+    requestAnimationFrame(function(){renderPortHeatmap(currentPortHmTab||'all');});
+  }
+});
 </script>
 </body>
 </html>
