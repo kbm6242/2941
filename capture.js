@@ -36,7 +36,7 @@ const CAPTURES = [
     isImage: false,
     waitMs: 9000,
     selector: '.heatmap-wrap',  // 또는 실제 히트맵 컨테이너 클래스
-    viewport: { width: 1600, height: 900 },
+    viewport: { width: 1600, height: 1200 },
     output: 'images/heatmap_kospi.png',
     runAt: 'KR',
   },
@@ -67,15 +67,25 @@ async function captureTarget(config, browser) {
     // 렌더링 대기
     await page.waitForTimeout(config.waitMs);
 
+    // 코스피 히트맵: 상단 헤더/팝업 건너뛰고 스크롤
+    if (config.id === 'kospi') {
+      await page.evaluate(() => window.scrollTo(0, 200));
+      await page.waitForTimeout(500);
+    }
+
     // 스크롤바 숨기기 (깔끔한 캡처)
     await page.addStyleTag({
       content: `
         ::-webkit-scrollbar { display: none !important; }
         * { scrollbar-width: none !important; }
-        .header, nav, footer, .ad, [class*="banner"], [class*="popup"], [id*="popup"] {
-          display: none !important;
-        }
-      `
+        /* 헤더/팝업/배너 제거 */
+        .header, header, nav, footer, .ad,
+        [class*="banner"], [class*="popup"], [id*="popup"],
+        [class*="dismiss"], [class*="Dismiss"],
+        [class*="modal"], [class*="toast"],
+        [class*="gnb"], [class*="lnb"],
+        .header-wrap, #header { display: none !important; }
+  `
     });
 
     let element = null;
