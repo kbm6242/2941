@@ -6,29 +6,30 @@ const isUSTime = (hour === '7' || hour === '07' || hour === 'all' || hour === 'm
 const isKRTime = (hour === '16' || hour === 'all' || hour === 'manual');
 
 const CAPTURES = [
-  {
-    id: 'sp500',
-    name: 'S&P 500',
-    url: 'https://finviz.com/map.ashx?t=sec&mn=snp500&o=-perf1d',
-    isImage: false,
-    waitMs: 8000,
-    // 히트맵 캔버스 요소만 크롭해서 저장
-    selector: '#mapcanvas',
-    viewport: { width: 1800, height: 900 },
-    output: 'images/heatmap_sp500.png',
-    runAt: 'US',
-  },
-  {
-    id: 'nasdaq',
-    name: 'Nasdaq 100',
-    url: 'https://finviz.com/map.ashx?t=sec_ndx&o=-perf1d',
-    isImage: false,
-    waitMs: 8000,
-    selector: '#mapcanvas',
-    viewport: { width: 1800, height: 900 },
-    output: 'images/heatmap_nasdaq.png',
-    runAt: 'US',
-  },
+{
+  id: 'sp500',
+  name: 'S&P 500',
+  url: 'https://finviz.com/map.ashx?t=sec&mn=snp500&o=-perf1d',
+  isImage: false,
+  waitMs: 8000,
+  selector: null,
+  clip: { x: 205, y: 60, width: 1595, height: 640 },
+  viewport: { width: 1800, height: 900 },
+  output: 'images/heatmap_sp500.png',
+  runAt: 'US',
+},
+{
+  id: 'nasdaq',
+  name: 'Nasdaq 100',
+  url: 'https://finviz.com/map.ashx?t=sec_ndx&o=-perf1d',
+  isImage: false,
+  waitMs: 8000,
+  selector: null,
+  clip: { x: 205, y: 60, width: 1595, height: 640 },
+  viewport: { width: 1800, height: 900 },
+  output: 'images/heatmap_nasdaq.png',
+  runAt: 'US',
+},
   {
     id: 'kospi',
     name: '코스피',
@@ -112,6 +113,12 @@ async function captureTarget(config, browser) {
           width: box.width,
           height: box.height,
         },
+      });
+    } else if (config.clip) {
+      await page.screenshot({
+        path: config.output,
+        type: 'png',
+        clip: config.clip,
       });
     } else {
       await page.screenshot({
