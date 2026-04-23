@@ -2,11 +2,13 @@ name: 히트맵 자동 캡처
 
 on:
   schedule:
-    # S&P500 / 나스닥: KST 월~금 07:00 = UTC 일~목 22:00
-    - cron: '0 22 * * 0-4'
-    # 코스피: KST 월~금 16:00 = UTC 월~금 07:00
-    - cron: '0 7 * * 1-5'
-  workflow_dispatch:  # 수동 실행 시 전체 캡처
+    # 미국장(S&P500/나스닥): KST 화~토 07:00 (월~금 미국장 마감 다음날 아침)
+    - cron: '0 7 * * 2-6'
+      timezone: 'Asia/Seoul'
+    # 한국장(코스피): KST 월~금 16:00 (장마감 후)
+    - cron: '0 16 * * 1-5'
+      timezone: 'Asia/Seoul'
+  workflow_dispatch:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -38,8 +40,6 @@ jobs:
       - name: 실행 시각 결정
         id: kst
         run: |
-          # 수동 실행(workflow_dispatch)이면 'manual' → 전체 캡처
-          # 스케줄 실행이면 KST 시각으로 판단
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "kst_hour=manual" >> $GITHUB_OUTPUT
             echo "수동 실행 → 전체 캡처"
