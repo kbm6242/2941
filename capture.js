@@ -35,7 +35,7 @@ const CAPTURES = [
     url: 'https://markets.hankyung.com/marketmap/kospi',
     isImage: false,
     waitMs: 9000,
-    selector: null,
+    selector: '.heatmap-wrap',  // 또는 실제 히트맵 컨테이너 클래스
     viewport: { width: 1600, height: 900 },
     output: 'images/heatmap_kospi.png',
     runAt: 'KR',
