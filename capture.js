@@ -91,7 +91,7 @@ async function captureTarget(config, browser) {
     let element = null;
     if (config.selector) {
       try {
-        element = await page.waitForSelector(config.selector, { timeout: 10000 });
+        element = await page.waitForSelector(config.selector, { timeout: 20000 });
         console.log(`   ✅ 선택자 발견: ${config.selector}`);
       } catch {
         console.log(`   ⚠️  선택자 없음 → 전체 화면 캡처`);
@@ -99,23 +99,28 @@ async function captureTarget(config, browser) {
     }
 
     if (element) {
-      // 요소 크기 확인
       const box = await element.boundingBox();
       console.log(`   📐 요소 크기: ${Math.round(box.width)}×${Math.round(box.height)}`);
 
-      // 요소만 캡처 (잘림 없음)
-      await element.screenshot({
+      // clip 방식으로 캡처 (canvas 요소도 정확히 캡처됨)
+      await page.screenshot({
         path: config.output,
         type: 'png',
+        clip: {
+          x: box.x,
+          y: box.y,
+          width: box.width,
+          height: box.height,
+        },
       });
     } else {
-      // 전체 화면 캡처
       await page.screenshot({
         path: config.output,
         type: 'png',
         fullPage: false,
       });
     }
+
 
     const stats = fs.statSync(config.output);
     console.log(`   ✅ 저장: ${config.output} (${(stats.size / 1024).toFixed(1)} KB)`);
