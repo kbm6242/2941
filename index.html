@@ -25,7 +25,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .brand-title{font-size:17px;font-weight:700;line-height:1.4;}
 .brand-sub{font-size:12px;color:var(--text-muted);margin-top:3px;font-family:'DM Mono',monospace;}
 .nav-section{padding:14px 10px 4px;}
-.nav-label{font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;padding:0 8px;margin-bottom:4px;}
+.nav-label{font-size:14px;font-weight:700;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;padding:0 8px;margin-bottom:4px;}
 .nav-item{display:flex;align-items:center;gap:9px;padding:10px 10px;border-radius:8px;cursor:pointer;color:var(--text-sub);font-size:15px;font-weight:500;transition:all .16s;margin-bottom:2px;border:1px solid transparent;position:relative;}
 .nav-item:hover{background:var(--surface);color:var(--text);}
 .nav-item.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(56,189,248,.25);}
@@ -290,8 +290,17 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
 .div-achieve-detail{font-size:13px;color:var(--text-muted);font-family:DM Mono,monospace;white-space:nowrap;}
 
 @media(max-width:900px){@media(max-width:900px){
-  .sidebar{width:56px;}
+  .sidebar{width:56px;transition:width .2s ease;overflow:visible;z-index:200;box-shadow:2px 0 16px rgba(0,0,0,.5);}
+  .sidebar:hover,.sidebar.expanded{width:220px;}
   .brand-title,.brand-sub,.nav-label,.nav-item span:not(.nav-icon),.nav-arrow,.sub-nav,.sidebar-footer span{display:none;}
+  .sidebar:hover .brand-title,.sidebar:hover .brand-sub,.sidebar:hover .nav-label,
+  .sidebar:hover .nav-item span:not(.nav-icon),.sidebar:hover .nav-arrow,
+  .sidebar:hover .sub-nav.open,.sidebar.expanded .brand-title,.sidebar.expanded .brand-sub,
+  .sidebar.expanded .nav-label,.sidebar.expanded .nav-item span:not(.nav-icon),
+  .sidebar.expanded .nav-arrow,.sidebar.expanded .sub-nav.open{display:flex;}
+  .sidebar:hover .nav-label,.sidebar.expanded .nav-label{display:block;}
+  .sidebar:hover .sub-nav.open,.sidebar.expanded .sub-nav.open{display:block;}
+  .sidebar:hover .nav-item,.sidebar.expanded .nav-item{justify-content:flex-start;padding:11px 16px;}
   .nav-item{justify-content:center;padding:11px;}
   .main{margin-left:56px;}
   .cards-top{grid-template-columns:1fr 1fr;}
@@ -805,7 +814,7 @@ async function loadAllSheetData(){
     fetchPub(GID_2026,'J8:J56'),  // [28] J열 전체 (연배당금액)
     fetchPub(GID_LOG,'A2:F500'),    // [29] 일별자산기록 전체
     fetchPub(GID_FAM,'C54'),           // [30] 총 매입원금
-    fetchPub(GID_LOG,'L2:M7'),         // [31] 주요지수 가격/등락률
+    fetchPub(GID_LOG,'L2:M8'),         // [31] 주요지수 가격/등락률 (L8까지 여유)
     fetchPub(GID_FAM,'C8:I20'),        // [32] 내계좌 종목
     fetchPub(GID_FAM,'C22:I26'),       // [33] 증여예정 종목
     fetchPub(GID_FAM,'C28:I32'),       // [34] 연금계좌 종목
@@ -1225,7 +1234,7 @@ function renderMarketIndex() {
   // IDX_LIST 순서 = J2:K7 순서 (다우/S&P/나스닥/러셀/코스피/코스닥)
   IDX_LIST.forEach((ix, i) => {
     const d = data[i];
-    if(!d || d.price === null) return;
+    if(!d || d.price === null) { renderIdxCard(ix, null); return; }
 
     const price = d.price;
     const pct   = d.pct || 0;
