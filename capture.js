@@ -32,7 +32,7 @@ const CAPTURES = [
   {
     id: 'kospi',
     name: '코스피',
-    url: 'https://markets.hankyung.com/heatmap/kospi',
+    url: 'https://markets.hankyung.com/marketmap/kospi',
     isImage: false,
     waitMs: 9000,
     selector: null,
