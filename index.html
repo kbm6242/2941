@@ -143,7 +143,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .idx-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
 .idx-title{font-size:20px;font-weight:800;color:var(--text);}
 .idx-update{font-size:12px;color:var(--text-muted);font-family:'DM Mono',monospace;background:var(--surface2);padding:3px 10px;border-radius:6px;}
-.idx-group-label{font-size:13px;font-weight:700;color:var(--text-muted);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;}
+.idx-group-label{font-size:17px;font-weight:700;color:var(--text-muted);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;}
 .idx-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
 @media(max-width:900px){.idx-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:600px){.idx-grid{grid-template-columns:1fr 1fr;}}
@@ -379,14 +379,20 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
     <div class="idx-card skeleton-card" id="idx-ks11"><div class="idx-skeleton"></div></div>
     <div class="idx-card skeleton-card" id="idx-kq11"><div class="idx-skeleton"></div></div>
   </div>
+
+  <div class="idx-group-label" style="margin-top:22px;">💱 환율</div>
+  <div class="idx-grid" id="idx-grid-fx">
+    <div class="idx-card skeleton-card" id="idx-usdkrw"><div class="idx-skeleton"></div></div>
+    <div class="idx-card skeleton-card" id="idx-jpykrw"><div class="idx-skeleton"></div></div>
+  </div>
 </div>
 
 <div class="page" id="page-heatmap">
     <div class="hm-tabs">
       <div class="hm-tab active" id="htab-sp500" onclick="switchHeatmap('sp500')">🇺🇸 S&amp;P 500</div>
       <div class="hm-tab" id="htab-nasdaq" onclick="switchHeatmap('nasdaq')">🖥 Nasdaq 100</div>
-      <div class="hm-tab" id="htab-russell" onclick="switchHeatmap('russell')">📊 Russell 2000</div>      
       <div class="hm-tab" id="htab-kospi" onclick="switchHeatmap('kospi')">🇰🇷 코스피</div>
+      <div class="hm-tab" id="htab-russell" onclick="switchHeatmap('russell')">📊 Russell 2000</div>
     </div>
     <!-- S&P 500 -->
     <div class="hm-frame-wrap" id="hm-sp500">
@@ -412,18 +418,6 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
           onerror="this.parentNode.innerHTML='<div class='hm-no-img'>📷 이미지 없음<br><span>GitHub Actions가 매일 KST 07:00에 자동 캡처합니다</span><br><a href='https://finviz.com/map.ashx?t=sec_ndx&o=-perf1d' target='_blank' class='hm-open-btn' style='margin-top:12px;'>📊 Finviz에서 보기</a></div>'">
       </div>
     </div>
-    <!-- Russell 2000 -->
-    <div class="hm-frame-wrap" id="hm-russell" style="display:none;">
-      <div class="hm-img-header">
-        <span class="hm-update-badge">🕖 매일 KST 07:00 자동 업데이트</span>
-        <span class="hm-date-badge" id="hm-date-russell">—</span>
-        <a class="hm-open-btn" href="https://finviz.com/map.ashx?t=sec&mn=russell2000&o=-perf1d" target="_blank">🔗 Finviz 실시간 보기</a>
-      </div>
-      <div class="hm-img-wrap" id="hm-img-russell">
-        <img id="hm-img-russell-img" data-src="./images/heatmap_russell.png" alt="Russell 2000 히트맵"
-          onerror="this.parentNode.innerHTML='<div class=\'hm-no-img\'>📷 이미지 없음<br><span>GitHub Actions가 매일 KST 07:00에 자동 캡처합니다</span><br><a href=\'https://finviz.com/map.ashx?t=sec&mn=russell2000&o=-perf1d\' target=\'_blank\' class=\'hm-open-btn\' style=\'margin-top:12px;\'>📊 Finviz에서 보기</a></div>'"> 
-      </div>
-    </div>
     <!-- 코스피 -->
     <div class="hm-frame-wrap" id="hm-kospi" style="display:none;">
       <div class="hm-img-header">
@@ -434,6 +428,18 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
       <div class="hm-img-wrap" id="hm-img-kospi">
         <img id="hm-img-kospi-img" data-src="./images/heatmap_kospi.png" alt="코스피 히트맵"
           onerror="this.parentNode.innerHTML='<div class='hm-no-img'>📷 이미지 없음<br><span>GitHub Actions가 매일 KST 16:00에 자동 캡처합니다</span><br><a href='https://markets.hankyung.com/heatmap/kospi' target='_blank' class='hm-open-btn' style='margin-top:12px;'>📊 한경에서 보기</a></div>'">
+      </div>
+    </div>
+    <!-- Russell 2000 -->
+    <div class="hm-frame-wrap" id="hm-russell" style="display:none;">
+      <div class="hm-img-header">
+        <span class="hm-update-badge">🕖 매일 KST 07:00 자동 업데이트</span>
+        <span class="hm-date-badge" id="hm-date-russell">—</span>
+        <a class="hm-open-btn" href="https://finviz.com/map.ashx?t=sec&mn=russell2000&o=-perf1d" target="_blank">🔗 Finviz 실시간 보기</a>
+      </div>
+      <div class="hm-img-wrap" id="hm-img-russell">
+        <img id="hm-img-russell-img" data-src="./images/heatmap_russell.png" alt="Russell 2000 히트맵"
+          onerror="this.parentNode.innerHTML='<div class=\'hm-no-img\'>📷 이미지 없음<br><span>GitHub Actions가 매일 KST 07:00에 자동 캡처합니다</span><br><a href=\'https://finviz.com/map.ashx?t=sec&mn=russell2000&o=-perf1d\' target=\'_blank\' class=\'hm-open-btn\' style=\'margin-top:12px;\'>📊 Finviz에서 보기</a></div>'">
       </div>
     </div>
   </div>
@@ -709,6 +715,35 @@ let DIVIDENDS={
 // ══════════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════════
+
+// 종목명 → 구글파이낸스 티커 매핑
+const TICKER_MAP = {
+  'TIGER 미국우주테크':            null,
+  'TIGER 현대차그룹플러스':         'KRX:138540',
+  '미국배당커버드콜액티브':          'KRX:441640',
+  '미국테크TOP10타겟커버드콜':       'KRX:474220',
+  '미국나스닥100타겟데일리커버드콜':  'KRX:486290',
+  '앱셀레라 바이오로직스':           'NASDAQ:ABCL',
+  '조비 에비에이션':                'NYSE:JOBY',
+  '테슬라':                        'NASDAQ:TSLA',
+  '엔비디아':                      'NASDAQ:NVDA',
+  '테라다인':                      'NASDAQ:TER',
+  'TSLW':  'BATS:TSLW',
+  'PLTW':  'BATS::PLTW',
+  'NVDW':  'BATS::NVDW',
+  'AMDW':  'BATS:AMDW',
+  'METW':  'BATS:METW',
+  'CHPY':  'CHPY',
+  'GOOW':  'BATS:GOOW',
+};
+function getFinanceUrl(name){
+  const ticker = TICKER_MAP[name];
+  if(!ticker) return null;
+  const parts = ticker.split(':');
+  // Google Finance URL: /finance/quote/TICKER:EXCHANGE
+  return 'https://www.google.com/finance/quote/' + parts[1] + ':' + parts[0];
+}
+
 let currentYear=2026,currentPage='trend',currentPeriod='daily';
 let trendChart=null,holdingsPage='all';
 const SD={
@@ -1270,6 +1305,38 @@ function renderMarketIndex() {
   });
 }
 
+
+function renderFxCards(){
+  const fx = SD.fxData || {};
+  const cards = [
+    { id:'usdkrw', name:'USD/KRW', label:'원/달러', data:fx.usdkrw, unit:'원', decimals:2 },
+    { id:'jpykrw', name:'JPY/KRW', label:'원/엔(100엔)', data:fx.jpykrw, unit:'원', decimals:2 },
+  ];
+  cards.forEach(c=>{
+    const el = document.getElementById('idx-'+c.id);
+    if(!el) return;
+    const d = c.data;
+    if(!d || d.price===null){
+      el.className='idx-card flat';
+      el.innerHTML=`<div class="idx-name">${c.label}</div><div class="idx-price">—</div><div class="idx-time">데이터 없음</div>`;
+      return;
+    }
+    const pct = d.pct||0;
+    const dir = pct>0.001?'up':pct<-0.001?'down':'flat';
+    const arrow = dir==='up'?'▲':dir==='down'?'▼':'—';
+    const pctStr = (pct>=0?'+':'')+pct.toFixed(2)+'%';
+    const priceStr = d.price.toLocaleString('ko-KR',{minimumFractionDigits:c.decimals,maximumFractionDigits:c.decimals});
+    el.className='idx-card '+dir;
+    el.innerHTML=`
+      <div class="idx-name">${c.label}</div>
+      <div class="idx-price">${priceStr}</div>
+      <div class="idx-change-row">
+        <span class="idx-pct ${dir}">${arrow} ${pctStr}</span>
+      </div>
+      <div class="idx-time">구글시트 연동</div>`;
+  });
+}
+
 // ══════════════════════════════════════════
 //  localStorage 일별
 // ══════════════════════════════════════════
@@ -1360,7 +1427,7 @@ function getMonthlyData(){
     2025:{
       san:[160532396,121680551,118269280,110579215,108155227,128282723,147221025,170316946,166441396,179848535,200076504,180022729,160532396],
       nae:[36736016,29024978,27393354,26687418,30315827,31474430,32917473,33605166,34800815,39089241,40393631,39395556,36736016],
-      boy:[12344747,39300679,36092957,35057456,null,null,null,null,null,null,null,null,null],
+      boy:[12344747,null,null,null,null,null,null,null,null,null,null,null,null],
     },
     2026:{
       san:[160532396,null,null,null,null,null,null,null,null,null,null,null,null],
@@ -1381,38 +1448,116 @@ function renderTrend(){
   dailyInfo.style.display=currentPeriod==='daily'?'flex':'none';
   if(currentPeriod==='daily')updateDailyInfo();
 
+  // ── 하드코딩 월말 기준점 (구글시트 mon 데이터 or fallback)
+  // LABELS_2026: [0]='25.12',[1]='26.1',...,[12]='26.12'
+  // LABELS_2025: [0]='25.12',[1]='25.1',...,[12]='25.12'
+  function getHardcodedMonthEnd(year){
+    // year=2026 → 26.1~26.3 월말 포인트 반환
+    // year=2025 → 25.1~25.12 월말 포인트
+    const mon2025fb={
+      san:[160532396,121680551,118269280,110579215,108155227,128282723,147221025,170316946,166441396,179848535,200076504,180022729,160532396],
+      nae:[36736016,29024978,27393354,26687418,30315827,31474430,32917473,33605166,34800815,39089241,40393631,39395556,36736016],
+      boy:[12344747,null,null,null,null,null,null,null,null,null,null,null,null],
+    };
+    // 2026년 1~3월 월말 → SD.mon2026에 값 있으면 사용, 없으면 직접 하드코딩
+    const mon2026={
+      // SD.mon2026.san[1~3] 우선, 없으면 null
+      san: SD.mon2026&&SD.mon2026.san ? SD.mon2026.san : [null,null,null,null],
+      nae: SD.mon2026&&SD.mon2026.nae ? SD.mon2026.nae : [null,null,null,null],
+      boy: SD.mon2026&&SD.mon2026.boy ? SD.mon2026.boy : [null,null,null,null],
+    };
+    if(year===2025){
+      // index 1=1월 ~ 12=12월
+      const monthDates=['2025-01-31','2025-02-28','2025-03-31','2025-04-30',
+                        '2025-05-31','2025-06-30','2025-07-31','2025-08-31',
+                        '2025-09-30','2025-10-31','2025-11-30','2025-12-31'];
+      return monthDates.map((d,i)=>({
+        date:d, san:mon2025fb.san[i+1], nae:mon2025fb.nae[i+1], boy:mon2025fb.boy[i+1], isHard:true
+      })).filter(e=>e.san||e.nae||e.boy);
+    }else{
+      // 2026년 1~3월 월말
+      const monthDates=['2026-01-31','2026-02-28','2026-03-31'];
+      return monthDates.map((d,i)=>({
+        date:d, san:mon2026.san[i+1]||null, nae:mon2026.nae[i+1]||null, boy:mon2026.boy[i+1]||null, isHard:true
+      })).filter(e=>e.san||e.nae||e.boy);
+    }
+  }
+
   let labels,sanArr,naeArr,boyArr;
+
   if(currentPeriod==='yearly'){
-    labels=['2023','2024','2025'];
-    sanArr=[40683340,136456066,160532396];naeArr=[4911980,27428703,36736016];boyArr=[0,0,12344747];
-    setEl('chart-title','연도별 자산 합계 (원금 비교)');
+    // ── 연별: 2025년 월말 하드코딩 + 2026년 1~3월 하드코딩 + 실제 일별→월말 합산
+    const hard2025 = getHardcodedMonthEnd(2025);
+    const hard2026 = getHardcodedMonthEnd(2026);
+    const hardEntries = [...hard2025, ...hard2026];
+
+    // 실제 일별 데이터에서 월말 추출 (2026-04-01 이후)
+    const liveEntries = loadDailyEntries().filter(e=>e.date>='2026-04-01');
+    const monthMap={};
+    liveEntries.forEach(e=>{ const ym=e.date.slice(0,7); monthMap[ym]=e; });
+    const liveMonthEnds = Object.keys(monthMap).sort().map(ym=>monthMap[ym]);
+
+    // 하드코딩 + 실제 데이터 합산, 중복 월 제거 (실제 우선)
+    const liveDates = new Set(liveMonthEnds.map(e=>e.date.slice(0,7)));
+    const merged = [
+      ...hardEntries.filter(e=>!liveDates.has(e.date.slice(0,7))),
+      ...liveMonthEnds
+    ].sort((a,b)=>a.date.localeCompare(b.date));
+
+    labels = merged.map(e=>{
+      const yr=e.date.slice(2,4); const mn=parseInt(e.date.slice(5,7));
+      return yr+'.'+mn;
+    });
+    sanArr = merged.map(e=>e.san||null);
+    naeArr = merged.map(e=>e.nae||null);
+    boyArr = merged.map(e=>e.boy||null);
+    setEl('chart-title','연도별 자산 추이 (월말 기준)');
+
   }else if(currentPeriod==='daily'){
     const entries=loadDailyEntries();
     if(!entries.length){drawEmptyChart('「오늘 저장」 버튼으로 첫 데이터를 추가하세요');return;}
     labels=entries.map(e=>e.date.slice(5));
     sanArr=entries.map(e=>e.san);naeArr=entries.map(e=>e.nae);boyArr=entries.map(e=>e.boy);
     setEl('chart-title','일별 자산 변화');
+
   }else{
-    // 월별 탭: 구글시트 13개 포인트 → 현재달 이후 null 강제처리
-    const d=getMonthlyData();
-    labels=d.labels;
-    const now=new Date();
-    const nowYr=now.getFullYear();const nowMon=now.getMonth()+1;
-    function cutFuture(arr){
-      return arr.map((v,i)=>{
-        const lbl=labels[i];
-        const parts=lbl.split('.');
-        let yr=parseInt(parts[0]);let mn=parseInt(parts[1]);
-        if(yr<100)yr+=2000;
-        if(yr>nowYr||(yr===nowYr&&mn>nowMon))return null;
-        return v;
-      });
+    // ── 월별: x축 = 1월~12월(해당 연도 고정), 하드코딩 월말 + 실제 일별 합산
+    const MONTH_LABELS=['01','02','03','04','05','06','07','08','09','10','11','12'];
+    const yearStr = String(currentYear);
+
+    // 하드코딩 월말 포인트
+    const hardPts = currentYear===2026
+      ? getHardcodedMonthEnd(2026)
+      : getHardcodedMonthEnd(2025);
+
+    // 실제 일별 데이터 (해당 연도, 2026년이면 04-21 이후만)
+    const cutoff = currentYear===2026 ? yearStr+'-04-21' : yearStr+'-01-01';
+    const liveEntries = loadDailyEntries().filter(e=>e.date.startsWith(yearStr)&&e.date>=cutoff);
+
+    // 하드코딩 월이 실제 데이터로 이미 커버되면 제거
+    const liveMonths = new Set(liveEntries.map(e=>e.date.slice(5,7)));
+    const filteredHard = hardPts.filter(e=>!liveMonths.has(e.date.slice(5,7)));
+
+    // 합산 및 날짜순 정렬
+    const allPts = [...filteredHard, ...liveEntries]
+      .sort((a,b)=>a.date.localeCompare(b.date));
+
+    if(!allPts.length){
+      // 완전히 데이터 없으면 fallback
+      const d=getMonthlyData();
+      labels=d.labels;
+      sanArr=d.san;naeArr=d.nae;boyArr=d.boy;
+    }else{
+      // x축: 'MM-DD' 형식, 각 달의 구간이 자연스럽게 표시됨
+      labels = allPts.map(e=>e.date.slice(5)); // 'MM-DD'
+      sanArr = allPts.map(e=>e.san||null);
+      naeArr = allPts.map(e=>e.nae||null);
+      boyArr = allPts.map(e=>e.boy||null);
     }
-    sanArr=cutFuture(d.san);naeArr=cutFuture(d.nae);boyArr=cutFuture(d.boy);
-    setEl('chart-title',currentYear+'년 월별 자산 변화');
+    setEl('chart-title', currentYear+'년 월별 자산 변화 (일별 추이)');
   }
 
-  // 총자산: 실 데이터가 있는 달만
+  // 총자산
   const totalArr=labels.map((_,i)=>{
     const s=sanArr[i],n=naeArr[i],b=boyArr[i];
     const sv=s&&s>0?s:0,nv=n&&n>0?n:0,bv=b&&b>0?b:0;
@@ -1422,44 +1567,56 @@ function renderTrend(){
 
   // 원금(buy) 라인
   let buyArr;
+  const fixBuy=calcTotalBuy()||null;
   if(currentPeriod==='daily'){
-    // 일별: entries의 buy 필드 사용, 없으면 calcTotalBuy 고정
     const allE=loadDailyEntries();
     if(allE.length>=2&&allE.some(e=>e.buy)){
       buyArr=allE.map(e=>e.buy||null);
     }else{
-      const fixBuy=calcTotalBuy()||null;
       buyArr=labels.map(()=>fixBuy);
     }
   }else if(currentPeriod==='yearly'){
-    buyArr=[35000000,110000000,150000000];
+    // 연별: merged 포인트에서 buy 값
+    const hard2025b = getHardcodedMonthEnd(2025).map(()=>null); // 하드코딩엔 buy 없음
+    const liveBuyEntries = loadDailyEntries().filter(e=>e.date>='2026-04-01');
+    const mbMap={};
+    liveBuyEntries.forEach(e=>{ const ym=e.date.slice(0,7); mbMap[ym]=e; });
+    const sortedYMs=Object.keys(mbMap).sort();
+    if(sortedYMs.length>0&&liveBuyEntries.some(e=>e.buy)){
+      // labels 기준으로 buy 맵핑
+      buyArr=labels.map(lbl=>{
+        const parts=lbl.split('.');
+        let yr=parseInt(parts[0]); if(yr<100)yr+=2000;
+        const mn=parseInt(parts[1]);
+        const ym=yr+'-'+String(mn).padStart(2,'0');
+        return mbMap[ym]?mbMap[ym].buy||null:null;
+      });
+    }else{
+      buyArr=labels.map(()=>fixBuy);
+    }
   }else{
-    // 월별: 현재 달까지만 원금선 표시, 이후는 null
-    const fixBuy=calcTotalBuy();
-    const now=new Date();
-    const nowYr=now.getFullYear();const nowMon=now.getMonth()+1; // 1-12
-    buyArr=labels.map(lbl=>{
-      // lbl 형식: '25.12','26.1' 등
-      const parts=lbl.split('.');
-      let yr=parseInt(parts[0]);let mn=parseInt(parts[1]);
-      if(yr<100)yr+=2000;
-      if(yr<nowYr||(yr===nowYr&&mn<=nowMon))return fixBuy;
-      return null;
-    });
+    // 월별: 실제 entries buy 사용
+    const cutoff2=currentYear===2026?String(currentYear)+'-04-21':String(currentYear)+'-01-01';
+    const filtered=loadDailyEntries().filter(e=>e.date.startsWith(String(currentYear))&&e.date>=cutoff2);
+    if(filtered.length>0&&filtered.some(e=>e.buy)){
+      // labels 기준으로 매핑
+      const buyMap={};
+      filtered.forEach(e=>{ buyMap[e.date.slice(5)]=e.buy||null; });
+      buyArr=labels.map(lbl=>buyMap[lbl]||fixBuy||null);
+    }else{
+      buyArr=labels.map(()=>fixBuy);
+    }
   }
 
-  // 계좌별 원금 라인 (일별이면 entries에서, 아니면 현재값 수평선)
+  // 계좌별 원금 라인
   const mkBuyLine = val => val ? labels.map(()=>val) : labels.map(()=>null);
   let sanBuyArr, naeBuyArr, boyBuyArr;
   if(currentPeriod==='daily'){
     const allE = loadDailyEntries();
-    const hasSanBuy = allE.some(e=>e.sanBuy);
-    const hasNaeBuy = allE.some(e=>e.naeBuy);
-    const hasBoyBuy = allE.some(e=>e.boyBuy);
-    sanBuyArr = hasSanBuy ? allE.map(e=>e.sanBuy||null) : mkBuyLine(SD.sanBuy);
-    naeBuyArr = hasNaeBuy ? allE.map(e=>e.naeBuy||null) : mkBuyLine(SD.naeBuy);
-    boyBuyArr = hasBoyBuy ? allE.map(e=>e.boyBuy||null) : mkBuyLine(SD.boyBuy);
-  } else {
+    sanBuyArr = allE.some(e=>e.sanBuy) ? allE.map(e=>e.sanBuy||null) : mkBuyLine(SD.sanBuy);
+    naeBuyArr = allE.some(e=>e.naeBuy) ? allE.map(e=>e.naeBuy||null) : mkBuyLine(SD.naeBuy);
+    boyBuyArr = allE.some(e=>e.boyBuy) ? allE.map(e=>e.boyBuy||null) : mkBuyLine(SD.boyBuy);
+  }else{
     sanBuyArr = mkBuyLine(SD.sanBuy);
     naeBuyArr = mkBuyLine(SD.naeBuy);
     boyBuyArr = mkBuyLine(SD.boyBuy);
@@ -1469,19 +1626,36 @@ function renderTrend(){
   const ctx=document.getElementById('trend-chart').getContext('2d');
   const gT=ctx.createLinearGradient(0,0,0,260);gT.addColorStop(0,'rgba(245,158,11,.2)');gT.addColorStop(1,'rgba(245,158,11,0)');
   const gS=ctx.createLinearGradient(0,0,0,260);gS.addColorStop(0,'rgba(56,189,248,.12)');gS.addColorStop(1,'rgba(56,189,248,0)');
-  const pt=currentPeriod==='daily'?0:4;
+  const pt=(currentPeriod==='daily'||currentPeriod==='monthly')?0:4;
+
+  // x축 tick callback
+  const xTickCb = currentPeriod==='monthly'
+    ? (val,idx,ticks)=>{
+        const lbl=labels[idx];
+        if(!lbl)return '';
+        const m=parseInt(lbl.slice(0,2));
+        // 각 달의 첫 포인트에만 월 라벨 표시
+        if(idx===0||parseInt(labels[idx-1]?.slice(0,2))<m)return m+'월';
+        return '';
+      }
+    : currentPeriod==='yearly'
+    ? (val,idx,ticks)=>{
+        // yearly: labels 배열 값 그대로 표시 (ex: '25.1', '25.12')
+        return labels[idx]||'';
+      }
+    : undefined;
 
   trendChart=new Chart(ctx,{
     type:'line',
     data:{labels,datasets:[
       {label:'우리집 총자산',data:totalArr,borderColor:'#f59e0b',backgroundColor:gT,borderWidth:2.5,pointRadius:pt,pointHoverRadius:6,fill:true,tension:0.35,spanGaps:false,hidden:!seriesOn.total,order:1},
-      {label:'총원금',data:buyArr,borderColor:'rgba(180,200,220,0.85)',backgroundColor:'transparent',borderWidth:2,borderDash:[6,3],pointRadius:0,pointHoverRadius:4,fill:false,tension:0,spanGaps:true,hidden:!seriesOn.buy,order:0},
+      {label:'총원금',data:buyArr,borderColor:'rgba(245,158,11,0.6)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[5,4],pointRadius:0,pointHoverRadius:4,fill:false,tension:0,spanGaps:true,hidden:!seriesOn.buy,order:0},
       {label:'산이계좌',data:sanArr,borderColor:'#38bdf8',backgroundColor:gS,borderWidth:2,pointRadius:pt,pointHoverRadius:5,fill:false,tension:0.35,spanGaps:false,hidden:!seriesOn.san,order:2},
       {label:'내계좌',data:naeArr,borderColor:'#a78bfa',backgroundColor:'transparent',borderWidth:2,pointRadius:pt,pointHoverRadius:5,fill:false,tension:0.35,spanGaps:false,hidden:!seriesOn.nae,order:3},
-      {label:'보연씌',data:boyArr,borderColor:'#f472b6',backgroundColor:'transparent',borderWidth:1.5,borderDash:[5,4],pointRadius:pt,pointHoverRadius:5,fill:false,tension:0.35,spanGaps:false,hidden:!seriesOn.boy,order:4},
-      {label:'산이 원금',data:sanBuyArr,borderColor:'rgba(56,189,248,0.5)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,4],pointRadius:0,pointHoverRadius:3,fill:false,tension:0,spanGaps:true,hidden:!seriesOn.sanBuy,order:5},
-      {label:'내계좌 원금',data:naeBuyArr,borderColor:'rgba(167,139,250,0.5)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,4],pointRadius:0,pointHoverRadius:3,fill:false,tension:0,spanGaps:true,hidden:!seriesOn.naeBuy,order:6},
-      {label:'보연이 원금',data:boyBuyArr,borderColor:'rgba(244,114,182,0.5)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,4],pointRadius:0,pointHoverRadius:3,fill:false,tension:0,spanGaps:true,hidden:!seriesOn.boyBuy,order:7},
+      {label:'보연씌',data:boyArr,borderColor:'#f472b6',backgroundColor:'transparent',borderWidth:1.5,pointRadius:pt,pointHoverRadius:5,fill:false,tension:0.35,spanGaps:false,hidden:!seriesOn.boy,order:4},
+      {label:'산이 원금',data:sanBuyArr,borderColor:'rgba(56,189,248,0.5)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[5,4],pointRadius:0,pointHoverRadius:3,fill:false,tension:0,spanGaps:true,hidden:!seriesOn.sanBuy,order:5},
+      {label:'내계좌 원금',data:naeBuyArr,borderColor:'rgba(167,139,250,0.5)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[5,4],pointRadius:0,pointHoverRadius:3,fill:false,tension:0,spanGaps:true,hidden:!seriesOn.naeBuy,order:6},
+      {label:'보연이 원금',data:boyBuyArr,borderColor:'rgba(244,114,182,0.5)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[5,4],pointRadius:0,pointHoverRadius:3,fill:false,tension:0,spanGaps:true,hidden:!seriesOn.boyBuy,order:7},
     ]},
     options:{
       responsive:true,maintainAspectRatio:false,
@@ -1510,12 +1684,13 @@ function renderTrend(){
         }
       },
       scales:{
-        x:{ticks:{color:'#4a6480',font:{size:13},maxTicksLimit:currentPeriod==='daily'?8:13},grid:{color:'#131c28'}},
+        x:{ticks:{color:'#4a6480',font:{size:13},maxTicksLimit:currentPeriod==='daily'?8:(currentPeriod==='monthly'?14:30),callback:xTickCb},grid:{color:'#131c28'}},
         y:{ticks:{color:'#4a6480',font:{size:13},callback:v=>v>=100000000?(v/100000000).toFixed(1)+'억':(v/10000000).toFixed(0)+'천만'},grid:{color:'#131c28'}}
       }
     }
   });
 }
+
 function drawEmptyChart(msg){
   if(trendChart)trendChart.destroy();
   const c=document.getElementById('trend-chart'),ctx=c.getContext('2d');
@@ -1662,7 +1837,11 @@ function renderHoldingsAll(){
     tbody.appendChild(hRow);
     sec.items.forEach(item=>{
       const rateNum=parseFloat((item.rate||'').replace(/[^0-9.-]/g,''));const pos=item.rate.includes('+')||(item.rate!==''&&rateNum>0&&!item.rate.includes('-'));const tr=document.createElement('tr');
-      tr.innerHTML=`<td class="td-name">  ${item.name}</td><td class="td-qty">${item.qty.toLocaleString()}</td><td class="td-price">${item.cur}</td><td class="td-price">${item.buy}</td><td class="td-price">${item.amt}</td><td class="${pos?'td-rate-pos':'td-rate-neg'}">${item.rate}</td><td class="td-val">${item.val}</td>`;
+      const finUrl = getFinanceUrl(item.name);
+      const nameHtml = finUrl
+        ? `<a href="${finUrl}" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px dashed rgba(148,175,200,0.4);cursor:pointer;" onmouseover="this.style.borderBottomColor='#38bdf8';this.style.color='#38bdf8'" onmouseout="this.style.borderBottomColor='rgba(148,175,200,0.4)';this.style.color='inherit'">${item.name}</a>`
+        : item.name;
+      tr.innerHTML=`<td class="td-name">  ${nameHtml}</td><td class="td-qty">${item.qty.toLocaleString()}</td><td class="td-price">${item.cur}</td><td class="td-price">${item.buy}</td><td class="td-price">${item.amt}</td><td class="${pos?'td-rate-pos':'td-rate-neg'}">${item.rate}</td><td class="td-val">${item.val}</td>`;
       tbody.appendChild(tr);
     });
   });
@@ -1750,8 +1929,49 @@ async function loadIndices(){
     if(el){el.className='idx-card skeleton-card';el.innerHTML='<div class="idx-skeleton"></div>';}
   });
 
+  // 구글시트 L2:M7 실시간 데이터 fetch (캐시 우회)
   try {
-    // GitHub Actions가 매일 생성하는 로컬 JSON 파일 fetch (CORS 없음)
+    const gsCsv = await fetchPub(GID_LOG, 'L2:M7', 9000);
+    const toNum = v => { const n = parseFloat(String(v).replace(/[^0-9.-]/g,'')); return isNaN(n)?null:n; };
+    const rows = parseCSV(gsCsv);
+    const mktData = [];
+    IDX_LIST.forEach((ix,i)=>{
+      const r = rows[i]||[];
+      const price = toNum(r[0]), pct = toNum(r[1]);
+      if(price !== null) mktData.push({id:ix.id, price, pct:pct||0});
+    });
+    if(mktData.length > 0){
+      SD.marketIndex = mktData;
+      renderMarketIndex();
+      const el = document.getElementById('idx-update-time');
+      if(el) el.textContent = '구글시트 실시간 연동 ' + new Date().toLocaleTimeString('ko-KR');
+      // 환율 데이터 L8:N9 fetch (L=현재가, M=등락률or보조, N=전일가)
+      try {
+        const fxCsv = await fetchPub(GID_LOG, 'L8:N9', 9000);
+        const fxRows = parseCSV(fxCsv);
+        const toN = v => { const n=parseFloat(String(v).replace(/[^0-9.-]/g,'')); return isNaN(n)?null:n; };
+        const calcPct = (cur, prev) => (cur && prev && prev!==0) ? (cur-prev)/prev*100 : null;
+        const usdPrice = toN(fxRows[0]?.[0]);
+        const usdM     = toN(fxRows[0]?.[1]); // M8: 등락률 수식 or 전일가 보조
+        const usdN     = toN(fxRows[0]?.[2]); // N8: 전일가(보조셀 사용시)
+        const jpyPrice = toN(fxRows[1]?.[0]);
+        const jpyM     = toN(fxRows[1]?.[1]);
+        const jpyN     = toN(fxRows[1]?.[2]);
+        // N열 전일가가 있으면 JS에서 계산, 없으면 M열 등락률 직접 사용
+        const usdPct = usdN ? calcPct(usdPrice, usdN) : (usdM !== null && usdM !== 0 ? usdM : null);
+        const jpyPct = jpyN ? calcPct(jpyPrice, jpyN) : (jpyM !== null && jpyM !== 0 ? jpyM : null);
+        SD.fxData = {
+          usdkrw: { price: usdPrice, pct: usdPct },
+          jpykrw: { price: jpyPrice, pct: jpyPct },
+        };
+        renderFxCards();
+      } catch(e) { renderFxCards(); }
+      return;
+    }
+  } catch(e){ /* GS 실패시 JSON fallback */ }
+
+  // fallback: GitHub Actions 로컬 JSON
+  try {
     const res = await fetch('./data/indices.json?v='+Date.now());
     if(!res.ok) throw new Error('HTTP '+res.status);
     const data = await res.json();
@@ -1771,7 +1991,6 @@ async function loadIndices(){
       }
     });
 
-    // 업데이트 시각
     const el = document.getElementById('idx-update-time');
     if(el && data.updated){
       const d = new Date(new Date(data.updated).getTime() + 9*3600*1000);
@@ -1779,7 +1998,6 @@ async function loadIndices(){
     }
 
   } catch(e) {
-    // indices.json 없으면 구글시트 데이터로 fallback
     if(SD.marketIndex && SD.marketIndex.length) {
       renderMarketIndex();
       const el = document.getElementById('idx-update-time');
@@ -1873,7 +2091,7 @@ function switchPage(page,el){
   if(page==='dividend') renderDividend();
   if(page==='holdings-all')renderHoldingsAll();
   if(page==='holdings-div')renderHoldingsDiv();
-  if(page==='indices') { if(SD.marketIndex&&SD.marketIndex.length) renderMarketIndex(); loadIndices(); }
+  if(page==='indices') { if(SD.marketIndex&&SD.marketIndex.length) renderMarketIndex(); if(SD.fxData) renderFxCards(); loadIndices(); }
   if(page==='heatmap'){initHeatmap(activeHm);applyHmCacheBuster();}
 }
 function toggleHoldingsMenu(el){
