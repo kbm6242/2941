@@ -391,8 +391,8 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
     <div class="hm-tabs">
       <div class="hm-tab active" id="htab-sp500" onclick="switchHeatmap('sp500')">🇺🇸 S&amp;P 500</div>
       <div class="hm-tab" id="htab-nasdaq" onclick="switchHeatmap('nasdaq')">🖥 Nasdaq 100</div>
-      <div class="hm-tab" id="htab-kospi" onclick="switchHeatmap('kospi')">🇰🇷 코스피</div>
       <div class="hm-tab" id="htab-russell" onclick="switchHeatmap('russell')">📊 Russell 2000</div>
+      <div class="hm-tab" id="htab-kospi" onclick="switchHeatmap('kospi')">🇰🇷 코스피</div>
     </div>
     <!-- S&P 500 -->
     <div class="hm-frame-wrap" id="hm-sp500">
@@ -418,18 +418,6 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
           onerror="this.parentNode.innerHTML='<div class='hm-no-img'>📷 이미지 없음<br><span>GitHub Actions가 매일 KST 07:00에 자동 캡처합니다</span><br><a href='https://finviz.com/map.ashx?t=sec_ndx&o=-perf1d' target='_blank' class='hm-open-btn' style='margin-top:12px;'>📊 Finviz에서 보기</a></div>'">
       </div>
     </div>
-    <!-- 코스피 -->
-    <div class="hm-frame-wrap" id="hm-kospi" style="display:none;">
-      <div class="hm-img-header">
-        <span class="hm-update-badge">🕓 매일 KST 16:00 자동 업데이트</span>
-        <span class="hm-date-badge" id="hm-date-kospi">—</span>
-        <a class="hm-open-btn" href="https://markets.hankyung.com/heatmap/kospi" target="_blank">🔗 한경 실시간 보기</a>
-      </div>
-      <div class="hm-img-wrap" id="hm-img-kospi">
-        <img id="hm-img-kospi-img" data-src="./images/heatmap_kospi.png" alt="코스피 히트맵"
-          onerror="this.parentNode.innerHTML='<div class='hm-no-img'>📷 이미지 없음<br><span>GitHub Actions가 매일 KST 16:00에 자동 캡처합니다</span><br><a href='https://markets.hankyung.com/heatmap/kospi' target='_blank' class='hm-open-btn' style='margin-top:12px;'>📊 한경에서 보기</a></div>'">
-      </div>
-    </div>
     <!-- Russell 2000 -->
     <div class="hm-frame-wrap" id="hm-russell" style="display:none;">
       <div class="hm-img-header">
@@ -440,6 +428,18 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
       <div class="hm-img-wrap" id="hm-img-russell">
         <img id="hm-img-russell-img" data-src="./images/heatmap_russell.png" alt="Russell 2000 히트맵"
           onerror="this.parentNode.innerHTML='<div class=\'hm-no-img\'>📷 이미지 없음<br><span>GitHub Actions가 매일 KST 07:00에 자동 캡처합니다</span><br><a href=\'https://finviz.com/map.ashx?t=sec&mn=russell2000&o=-perf1d\' target=\'_blank\' class=\'hm-open-btn\' style=\'margin-top:12px;\'>📊 Finviz에서 보기</a></div>'">
+      </div>
+    </div>
+    <!-- 코스피 -->
+    <div class="hm-frame-wrap" id="hm-kospi" style="display:none;">
+      <div class="hm-img-header">
+        <span class="hm-update-badge">🕓 매일 KST 16:00 자동 업데이트</span>
+        <span class="hm-date-badge" id="hm-date-kospi">—</span>
+        <a class="hm-open-btn" href="https://markets.hankyung.com/heatmap/kospi" target="_blank">🔗 한경 실시간 보기</a>
+      </div>
+      <div class="hm-img-wrap" id="hm-img-kospi">
+        <img id="hm-img-kospi-img" data-src="./images/heatmap_kospi.png" alt="코스피 히트맵"
+          onerror="this.parentNode.innerHTML='<div class='hm-no-img'>📷 이미지 없음<br><span>GitHub Actions가 매일 KST 16:00에 자동 캡처합니다</span><br><a href='https://markets.hankyung.com/heatmap/kospi' target='_blank' class='hm-open-btn' style='margin-top:12px;'>📊 한경에서 보기</a></div>'">
       </div>
     </div>
   </div>
