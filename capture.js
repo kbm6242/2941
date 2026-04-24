@@ -9,7 +9,7 @@ const CAPTURES = [
 {
   id: 'sp500',
   name: 'S&P 500',
-  url: 'https://finviz.com/map.ashx?t=sec&mn=snp500&o=-perf1d',
+  url: 'https://finviz.com/map.ashx?t=sec&mn=snp500',
   isImage: false,
   waitMs: 8000,
   selector: null,
@@ -21,7 +21,7 @@ const CAPTURES = [
 {
   id: 'nasdaq',
   name: 'Nasdaq 100',
-  url: 'https://finviz.com/map.ashx?t=sec_ndx&o=-perf1d',
+  url: 'https://finviz.com/map.ashx?t=sec_ndx',
   isImage: false,
   waitMs: 8000,
   selector: null,
