@@ -729,8 +729,8 @@ const TICKER_MAP = {
   '엔비디아':                      'NASDAQ:NVDA',
   '테라다인':                      'NASDAQ:TER',
   'TSLW':  'BATS:TSLW',
-  'PLTW':  'BATS::PLTW',
-  'NVDW':  'BATS::NVDW',
+  'PLTW':  'BATS:PLTW',
+  'NVDW':  'BATS:NVDW',
   'AMDW':  'BATS:AMDW',
   'METW':  'BATS:METW',
   'CHPY':  'CHPY',
@@ -1516,7 +1516,7 @@ function renderTrend(){
   }else if(currentPeriod==='daily'){
     const entries=loadDailyEntries();
     if(!entries.length){drawEmptyChart('「오늘 저장」 버튼으로 첫 데이터를 추가하세요');return;}
-    labels=entries.map(e=>e.date.slice(5));
+    labels=entries.map(e=>{ const p=e.date.slice(5).split('-'); return parseInt(p[0])+'.'+p[1]; });
     sanArr=entries.map(e=>e.san);naeArr=entries.map(e=>e.nae);boyArr=entries.map(e=>e.boy);
     setEl('chart-title','일별 자산 변화');
 
@@ -1549,7 +1549,7 @@ function renderTrend(){
       sanArr=d.san;naeArr=d.nae;boyArr=d.boy;
     }else{
       // x축: 'MM-DD' 형식, 각 달의 구간이 자연스럽게 표시됨
-      labels = allPts.map(e=>e.date.slice(5)); // 'MM-DD'
+      labels = allPts.map(e=>{ const p=e.date.slice(5).split('-'); return parseInt(p[0])+'.'+p[1]; }); // 'M.DD'
       sanArr = allPts.map(e=>e.san||null);
       naeArr = allPts.map(e=>e.nae||null);
       boyArr = allPts.map(e=>e.boy||null);
@@ -1626,16 +1626,23 @@ function renderTrend(){
   const ctx=document.getElementById('trend-chart').getContext('2d');
   const gT=ctx.createLinearGradient(0,0,0,260);gT.addColorStop(0,'rgba(245,158,11,.2)');gT.addColorStop(1,'rgba(245,158,11,0)');
   const gS=ctx.createLinearGradient(0,0,0,260);gS.addColorStop(0,'rgba(56,189,248,.12)');gS.addColorStop(1,'rgba(56,189,248,0)');
-  const pt=(currentPeriod==='daily'||currentPeriod==='monthly')?0:4;
+  // 포인트 크기: 데이터 수가 적으면 동그라미 표시, 많으면 숨김
+  const ptCount = labels.length;
+  const pt = currentPeriod==='yearly' ? 4
+    : currentPeriod==='daily' ? (ptCount<=60?3:0)
+    : (ptCount<=60?3:0); // monthly도 동일
 
   // x축 tick callback
-  const xTickCb = currentPeriod==='monthly'
+  const xTickCb = currentPeriod==='daily'
+    ? (val,idx,ticks)=>{ return labels[idx]||''; }
+    : currentPeriod==='monthly'
     ? (val,idx,ticks)=>{
         const lbl=labels[idx];
         if(!lbl)return '';
-        const m=parseInt(lbl.slice(0,2));
+        const m=parseInt(lbl.split('.')[0]);
         // 각 달의 첫 포인트에만 월 라벨 표시
-        if(idx===0||parseInt(labels[idx-1]?.slice(0,2))<m)return m+'월';
+        const prevM=idx>0?parseInt(labels[idx-1]?.split('.')[0]||0):0;
+        if(idx===0||prevM<m)return m+'월';
         return '';
       }
     : currentPeriod==='yearly'
