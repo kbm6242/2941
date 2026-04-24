@@ -33,7 +33,7 @@ const CAPTURES = [
   {
   id: 'russell',
   name: 'Russell 2000',
-  url: 'https://finviz.com/map.ashx?t=sec&mn=russell2000&o=-perf1d',
+  url: 'https://finviz.com/map.ashx?t=sec_rut',
   isImage: false,
   waitMs: 8000,
   selector: null,
