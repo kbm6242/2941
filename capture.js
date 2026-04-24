@@ -31,6 +31,18 @@ const CAPTURES = [
   runAt: 'US',
 },
   {
+  id: 'russell',
+  name: 'Russell 2000',
+  url: 'https://finviz.com/map.ashx?t=sec&mn=russell2000&o=-perf1d',
+  isImage: false,
+  waitMs: 8000,
+  selector: null,
+  clip: { x: 400, y: 60, width: 1210, height: 730 },  // S&P 500과 동일
+  viewport: { width: 1800, height: 900 },
+  output: 'images/heatmap_russell.png',
+  runAt: 'US',  // KST 07:00에 S&P, Nasdaq과 함께 캡처
+},
+  {
     id: 'kospi',
     name: '코스피',
     url: 'https://markets.hankyung.com/marketmap/kospi',
