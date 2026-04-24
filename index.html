@@ -385,6 +385,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
     <div class="hm-tabs">
       <div class="hm-tab active" id="htab-sp500" onclick="switchHeatmap('sp500')">🇺🇸 S&amp;P 500</div>
       <div class="hm-tab" id="htab-nasdaq" onclick="switchHeatmap('nasdaq')">🖥 Nasdaq 100</div>
+      <div class="hm-tab" id="htab-russell" onclick="switchHeatmap('russell')">📊 Russell 2000</div>      
       <div class="hm-tab" id="htab-kospi" onclick="switchHeatmap('kospi')">🇰🇷 코스피</div>
     </div>
     <!-- S&P 500 -->
@@ -409,6 +410,18 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
       <div class="hm-img-wrap" id="hm-img-nasdaq">
         <img id="hm-img-nasdaq-img" data-src="./images/heatmap_nasdaq.png" alt="Nasdaq100 히트맵"
           onerror="this.parentNode.innerHTML='<div class='hm-no-img'>📷 이미지 없음<br><span>GitHub Actions가 매일 KST 07:00에 자동 캡처합니다</span><br><a href='https://finviz.com/map.ashx?t=sec_ndx&o=-perf1d' target='_blank' class='hm-open-btn' style='margin-top:12px;'>📊 Finviz에서 보기</a></div>'">
+      </div>
+    </div>
+    <!-- Russell 2000 -->
+    <div class="hm-frame-wrap" id="hm-russell" style="display:none;">
+      <div class="hm-img-header">
+        <span class="hm-update-badge">🕖 매일 KST 07:00 자동 업데이트</span>
+        <span class="hm-date-badge" id="hm-date-russell">—</span>
+        <a class="hm-open-btn" href="https://finviz.com/map.ashx?t=sec&mn=russell2000&o=-perf1d" target="_blank">🔗 Finviz 실시간 보기</a>
+      </div>
+      <div class="hm-img-wrap" id="hm-img-russell">
+        <img id="hm-img-russell-img" data-src="./images/heatmap_russell.png" alt="Russell 2000 히트맵"
+          onerror="this.parentNode.innerHTML='<div class=\'hm-no-img\'>📷 이미지 없음<br><span>GitHub Actions가 매일 KST 07:00에 자동 캡처합니다</span><br><a href=\'https://finviz.com/map.ashx?t=sec&mn=russell2000&o=-perf1d\' target=\'_blank\' class=\'hm-open-btn\' style=\'margin-top:12px;\'>📊 Finviz에서 보기</a></div>'"> 
       </div>
     </div>
     <!-- 코스피 -->
@@ -1708,7 +1721,7 @@ function getHmDateLabel(type){
 function updateHmDateLabels(){
   const usLabel = getHmDateLabel('us');
   const koLabel = getHmDateLabel('ko');
-  ['sp500','nasdaq'].forEach(t=>{
+  ['sp500','nasdaq','russell'].forEach(t=>{
     const el=document.getElementById('hm-date-'+t);
     if(el) el.textContent = usLabel;
   });
@@ -1832,13 +1845,13 @@ function getHmCacheKey(){
 }
 function applyHmCacheBuster(){
   const v=getHmCacheKey();
-  ['sp500','nasdaq','kospi'].forEach(function(t){
+  ['sp500','nasdaq','kospi','russell'].forEach(function(t){
     const img=document.getElementById('hm-img-'+t+'-img');
     if(img&&img.dataset.src) img.src=img.dataset.src+'?v='+v;
   });
   updateHmDateLabels();
 }
-function switchHeatmap(type){activeHm=type;['sp500','nasdaq','kospi'].forEach(t=>{const w=document.getElementById('hm-'+t);if(w)w.style.display=t===type?'block':'none';document.getElementById('htab-'+t)?.classList.toggle('active',t===type);});initHeatmap(type);applyHmCacheBuster();}
+function switchHeatmap(type){activeHm=type;['sp500','nasdaq','kospi','russell'].forEach(t=>{const w=document.getElementById('hm-'+t);if(w)w.style.display=t===type?'block':'none';document.getElementById('htab-'+t)?.classList.toggle('active',t===type);});initHeatmap(type);applyHmCacheBuster();}
 function initHeatmap(type){if(hmInit[type])return;hmInit[type]=true;const iframe=document.getElementById('iframe-'+type);if(iframe){iframe.src=HM_URLS[type];setTimeout(()=>hmCheck(type),5000);}}
 function hmLoaded(type){try{document.getElementById('iframe-'+type)?.contentDocument;document.getElementById('hm-'+type+'-loading').style.display='none';}catch(e){if(e.name==='SecurityError')document.getElementById('hm-'+type+'-loading').style.display='none';else hmError(type);}}
 function hmError(type){document.getElementById('hm-'+type+'-loading').style.display='none';const iframe=document.getElementById('iframe-'+type);if(iframe)iframe.style.display='none';document.getElementById('hm-'+type+'-blocked')?.classList.add('show');}
