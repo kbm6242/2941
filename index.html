@@ -733,14 +733,14 @@ const TICKER_MAP = {
   'NVDW':  'BATS:NVDW',
   'AMDW':  'BATS:AMDW',
   'METW':  'BATS:METW',
-  'CHPY':  'CHPY',
+  'CHPY':  'NYSEARCA:CHPY',
   'GOOW':  'BATS:GOOW',
 };
 function getFinanceUrl(name){
   const ticker = TICKER_MAP[name];
   if(!ticker) return null;
   const parts = ticker.split(':');
-  // Google Finance URL: /finance/quote/TICKER:EXCHANGE
+  if(parts.length < 2 || !parts[1]) return null; // 거래소:티커 형식 아니면 null
   return 'https://www.google.com/finance/quote/' + parts[1] + ':' + parts[0];
 }
 
