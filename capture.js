@@ -2,8 +2,8 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 
 const hour = process.argv[2];
-const isUSTime = (hour === '7' || hour === '07' || hour === 'all' || hour === 'manual');
-const isKRTime = (hour === '16' || hour === 'all' || hour === 'manual');
+const isUSTime = (hour === 'US' || hour === 'all');
+const isKRTime = (hour === 'KR' || hour === 'all');
 
 const CAPTURES = [
 {
