@@ -35,20 +35,25 @@ jobs:
       - name: images 폴더 생성
         run: mkdir -p images
 
-      - name: 실행 시각 결정
-        id: kst
+      - name: 캡처 타입 결정
+        id: captype
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "kst_hour=manual" >> $GITHUB_OUTPUT
+            echo "type=all" >> $GITHUB_OUTPUT
             echo "수동 실행 → 전체 캡처"
           else
-            KST_HOUR=$(TZ='Asia/Seoul' date +%H)
-            echo "kst_hour=$KST_HOUR" >> $GITHUB_OUTPUT
-            echo "스케줄 실행 → KST ${KST_HOUR}시 기준 캡처"
+            UTC_HOUR=$(date +%H)
+            if [ "$UTC_HOUR" = "22" ] || [ "$UTC_HOUR" = "23" ] || [ "$UTC_HOUR" = "00" ]; then
+              echo "type=US" >> $GITHUB_OUTPUT
+              echo "스케줄 실행 → 미국장 캡처"
+            else
+              echo "type=KR" >> $GITHUB_OUTPUT
+              echo "스케줄 실행 → 한국장 캡처"
+            fi
           fi
 
       - name: 히트맵 캡처
-        run: node capture.js ${{ steps.kst.outputs.kst_hour }}
+        run: node capture.js ${{ steps.captype.outputs.type }}
 
       - name: 이미지 커밋 및 푸시
         run: |
