@@ -896,7 +896,7 @@ async function loadAllSheetData(){
   dbgLog.length=0;
 
   const results=await Promise.allSettled([
-    // 카드 현재값
+    // 카드 현재값 변경시 여기 수정
     fetchPub(GID_FAM,'C3'),   // [0] 총자산
     fetchPub(GID_FAM,'K3'),   // [1] 내계좌
     fetchPub(GID_FAM,'M3'),   // [2] 보연씌
