@@ -305,6 +305,47 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
   .main{margin-left:56px;}
   .cards-top{grid-template-columns:1fr 1fr;}
 }
+
+/* ── 지수 티커 슬라이더 ── */
+.idx-ticker{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:0 14px;
+  width:320px;min-width:320px;max-width:320px;
+  flex-shrink:0;flex-grow:0;box-sizing:border-box;
+  overflow:hidden;
+  cursor:default;user-select:none;transition:border-color .2s;
+}
+.idx-ticker:hover{border-color:var(--border2);}
+.idx-ticker-viewport{
+  overflow:hidden;
+  width:256px;min-width:256px;  /* 고정 폭 (320 - 아이콘14 - gap8 - padding28) */
+  height:22px;min-height:22px;max-height:22px;
+  position:relative;
+  flex:none;
+}
+.idx-ticker-slide{
+  position:absolute;top:0;left:0;
+  width:100%;height:100%;
+  display:flex;align-items:center;gap:0;
+  white-space:nowrap;overflow:hidden;
+}
+.tk-name{
+  font-size:16px;font-weight:700;
+  color:var(--text);
+  padding-right:10px;flex-shrink:0;
+}
+.tk-price{
+  font-family:'DM Mono',monospace;
+  font-size:16px;font-weight:700;
+  color:var(--text);
+  padding-right:8px;flex-shrink:0;
+}
+.tk-pct{
+  font-family:'DM Mono',monospace;
+  font-size:12px;font-weight:700;
+  flex-shrink:0;
+}
 </style>
 </head>
 <body>
@@ -345,6 +386,15 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
   <div class="topbar">
     <div class="topbar-title" id="page-title">자산 추이</div>
     <div class="topbar-right">
+      <div class="idx-ticker" id="idx-ticker" style="width:320px;min-width:320px;max-width:320px;overflow:hidden;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px 14px;flex-shrink:0;box-sizing:border-box;cursor:default;user-select:none;" title="마우스를 올리면 전환 고정" onmouseenter="tickerPaused=true" onmouseleave="tickerPaused=false">
+        <span style="font-size:14px;flex-shrink:0;opacity:.7;">📊</span>
+        <div class="idx-ticker-viewport" id="idx-ticker-viewport" style="overflow:hidden;width:256px;min-width:256px;height:24px;min-height:24px;max-height:24px;position:relative;flex:none;">
+          <div class="idx-ticker-slide">
+            <span class="tk-name">로딩 중</span>
+            <span class="tk-price" style="color:var(--text-muted);">—</span>
+          </div>
+        </div>
+      </div>
       <div class="fx-badge" onclick="fetchExchangeRate()" title="클릭하여 갱신">
         <span style="font-size:15px">🇺🇸</span>
         <span class="fx-label">USD/KRW</span>
@@ -1324,11 +1374,20 @@ function renderMarketIndex() {
       </div>
       <div class="idx-time">구글시트 연동</div>`;
   });
+  // 티커 슬라이더 데이터 갱신
+  initTicker();
 }
 
 
 function renderFxCards(){
   const fx = SD.fxData || {};
+  // ── 상단 배지 동기화: GID_LOG L8 기준으로 fx-badge와 통일
+  if(fx.usdkrw&&fx.usdkrw.price){
+    const n=fx.usdkrw.price; SD.fxRate=n;
+    const vEl=document.getElementById('fx-val'),sEl=document.getElementById('fx-src');
+    if(vEl) vEl.textContent=n.toLocaleString('ko-KR',{minimumFractionDigits:1,maximumFractionDigits:1})+'원';
+    if(sEl) sEl.textContent='시트';
+  }
   const cards = [
     { id:'usdkrw', name:'USD/KRW', label:'원/달러', data:fx.usdkrw, unit:'원', decimals:2 },
     { id:'jpykrw', name:'JPY/KRW', label:'원/엔(100엔)', data:fx.jpykrw, unit:'원', decimals:2 },
@@ -1742,10 +1801,86 @@ function drawEmptyChart(msg){
 // ══════════════════════════════════════════
 //  환율
 // ══════════════════════════════════════════
+// ══════════════════════════════════════════
+//  상단 지수 티커 슬라이더
+// ══════════════════════════════════════════
+let tickerItems=[], tickerIdx=0, tickerPaused=false, tickerInterval=null;
+
+function buildTickerSlide(item){
+  const div=document.createElement('div');
+  // inline style로 직접 고정 (CSS 클래스 적용 여부와 무관)
+  div.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;';
+  if(!item){
+    div.innerHTML='<span style="font-size:11px;color:var(--text-muted);font-weight:700;">—</span>';
+    return div;
+  }
+  const arrow=item.dir==='up'?'▲':item.dir==='down'?'▼':'—';
+  const pctStr=(item.pct>=0?'+':'')+item.pct.toFixed(2)+'%';
+  const pctColor=item.dir==='up'?'var(--red)':item.dir==='down'?'var(--green)':'var(--text-muted)';
+  const fmtP=n=>n>=1000?n.toLocaleString('ko-KR',{minimumFractionDigits:2,maximumFractionDigits:2}):n.toFixed(2);
+  div.innerHTML=
+    `<span style="font-size:16px;font-weight:700;color:var(--text);padding-right:10px;white-space:nowrap;flex-shrink:0;">${item.name}</span>`+
+    `<span style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--text);padding-right:8px;white-space:nowrap;flex-shrink:0;">${fmtP(item.price)}</span>`+
+    `<span style="font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:${pctColor};white-space:nowrap;flex-shrink:0;">${arrow} ${pctStr}</span>`;
+  return div;
+}
+
+function tickerAdvance(){
+  if(tickerPaused||tickerItems.length===0) return;
+  const vp=document.getElementById('idx-ticker-viewport');
+  if(!vp) return;
+  tickerIdx=(tickerIdx+1)%tickerItems.length;
+  const cur=vp.firstElementChild;
+  const nxt=buildTickerSlide(tickerItems[tickerIdx]);
+  // 새 슬라이드: 아래에서 대기
+  nxt.style.transform='translateY(100%)';
+  nxt.style.opacity='0';
+  vp.appendChild(nxt);
+  // 두 번 rAF으로 layout flush 후 애니메이션 시작
+  requestAnimationFrame(()=>{requestAnimationFrame(()=>{
+    if(cur){
+      cur.style.transition='transform .38s cubic-bezier(.23,1,.32,1),opacity .28s';
+      cur.style.transform='translateY(-100%)';
+      cur.style.opacity='0';
+    }
+    nxt.style.transition='transform .38s cubic-bezier(.23,1,.32,1),opacity .28s';
+    nxt.style.transform='translateY(0)';
+    nxt.style.opacity='1';
+    setTimeout(()=>{if(cur&&cur.parentNode)cur.remove();},420);
+  });});
+}
+
+function initTicker(){
+  const data=SD.marketIndex||[];
+  tickerItems=IDX_LIST.map((ix,i)=>{
+    const d=data[i];
+    if(!d||d.price===null||d.price===undefined) return null;
+    const pct=d.pct||0,dir=pct>0.001?'up':pct<-0.001?'down':'flat';
+    return{name:ix.name,price:d.price,pct,dir};
+  }).filter(Boolean);
+  const vp=document.getElementById('idx-ticker-viewport');
+  if(!vp||tickerItems.length===0) return;
+  tickerIdx=0;
+  vp.innerHTML='';
+  const first=buildTickerSlide(tickerItems[0]);
+  first.style.transform='translateY(0)';
+  first.style.opacity='1';
+  vp.appendChild(first);
+  if(tickerInterval) clearInterval(tickerInterval);
+  tickerInterval=setInterval(tickerAdvance,3000);
+}
+
 async function fetchExchangeRate(){
   const vEl=document.getElementById('fx-val'),sEl=document.getElementById('fx-src');vEl.textContent='…';
-  try{const t=await fetchPub(GID_FAM,'A2',5000);const m=t.replace(/["\s]/g,'').match(/[\d,]+\.?\d*/);if(m){const n=parseFloat(m[0].replace(/,/g,''));if(n>900&&n<2500){SD.fxRate=n;vEl.textContent=n.toLocaleString('ko-KR',{minimumFractionDigits:1})+'원';sEl.textContent='시트';return;}}}catch(_){}
-  try{const r=await fetch('https://open.er-api.com/v6/latest/USD',{signal:AbortSignal.timeout(7000)});if(r.ok){const j=await r.json();const rate=j.rates?.KRW;if(rate){SD.fxRate=Math.round(rate);vEl.textContent=Math.round(rate).toLocaleString()+'원';sEl.textContent='API';return;}}}catch(_){}
+  // 1순위: SD.fxData (loadIndices에서 GID_LOG L8로 이미 로드된 경우 - 통일)
+  if(SD.fxData&&SD.fxData.usdkrw&&SD.fxData.usdkrw.price){
+    const n=SD.fxData.usdkrw.price;SD.fxRate=n;
+    vEl.textContent=n.toLocaleString('ko-KR',{minimumFractionDigits:1,maximumFractionDigits:1})+'원';sEl.textContent='시트';return;
+  }
+  // 2순위: GID_LOG L8 직접 fetch (주요지수 카드와 동일한 출처)
+  try{const t=await fetchPub(GID_LOG,'L8',5000);const m=t.replace(/["\s]/g,'').match(/[\d,]+\.?\d*/);if(m){const n=parseFloat(m[0].replace(/,/g,''));if(n>900&&n<2500){SD.fxRate=n;vEl.textContent=n.toLocaleString('ko-KR',{minimumFractionDigits:1,maximumFractionDigits:1})+'원';sEl.textContent='시트';return;}}}catch(_){}
+  // 3순위: 외부 API
+  try{const r=await fetch('https://open.er-api.com/v6/latest/USD',{signal:AbortSignal.timeout(7000)});if(r.ok){const j=await r.json();const rate=j.rates?.KRW;if(rate){SD.fxRate=parseFloat(rate.toFixed(1));vEl.textContent=rate.toLocaleString('ko-KR',{minimumFractionDigits:1,maximumFractionDigits:1})+'원';sEl.textContent='API';return;}}}catch(_){}
   vEl.textContent='오류';sEl.textContent='';
 }
 fetchExchangeRate();setInterval(fetchExchangeRate,5*60*1000);
@@ -2566,10 +2701,10 @@ function renderPortHeatmap(tab){
     +'<span style="background:#00AB00;color:#fff;padding:1px 7px;border-radius:3px;">+30%</span>'
     +'<span style="background:#008800;color:#fff;padding:1px 7px;border-radius:3px;">+20%</span>'
     +'<span style="background:#005E00;color:#fff;padding:1px 7px;border-radius:3px;">+10%</span>'
-    +'<span style="background:#001100;color:#fff;padding:1px 7px;border-radius:3px;">0%</span>'
-    +'<span style="background:#B60000;color:#fff;padding:1px 7px;border-radius:3px;">-10%</span>'
+    +'<span style="background:#001100;color:#276749;padding:1px 7px;border-radius:3px;">0%</span>'
+    +'<span style="background:#B60000;color:#742a2a;padding:1px 7px;border-radius:3px;">-10%</span>'
     +'<span style="background:#ED0000;color:#fff;padding:1px 7px;border-radius:3px;">-20%</span>'
-    +'<span style="background:#FF0A0A;color:#fff;padding:1px 7px;border-radius:3px;">-30%</span>'
+    +'<span style="background:#FF0A0A;color:#fed7d7;padding:1px 7px;border-radius:3px;">-30%</span>'
     +'<span style="margin-left:auto;font-family:DM Mono,monospace;">총 '+rows.length+'종목 · 박스크기=평가금액</span>'
     +'</div>';
 
