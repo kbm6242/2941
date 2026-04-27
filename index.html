@@ -1082,7 +1082,7 @@ async function loadAllSheetData(){
     if(!deRes||deRes.status!=='fulfilled') return [];
     const deRows = parseCSV(deRes.value);
     return deRows.map((row, i) => {
-      const name = (row[0]||'').trim();
+      const name = (row[0]||'').trim().replace(/\s*\(.*?\)\s*$/, '').trim(); //(주배당), (월배당) 등 괄호 내용 자동 제거
       const qty  = parseInt((row[1]||'0').replace(/[^0-9]/g,''))||0;
       if(!name) return null;
       // 매매/합계 등 소계행 제외 (종목명 키워드 또는 수량 0 제외)
