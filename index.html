@@ -55,7 +55,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
 .fx-badge{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px 14px;cursor:pointer;}
 .fx-badge:hover{border-color:var(--border2);}
-.fx-label{font-size:12px;color:var(--text-muted);font-weight:700;letter-spacing:.5px;}
+.fx-label{font-size:12px;color:var(--text);font-weight:700;letter-spacing:.5px;}
 .fx-val{font-size:16px;font-weight:700;color:var(--gold);font-family:'DM Mono',monospace;min-width:64px;}
 .fx-src{font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;}
 .year-btns{display:flex;gap:4px;}
@@ -396,10 +396,9 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
         </div>
       </div>
       <div class="fx-badge" onclick="fetchExchangeRate()" title="클릭하여 갱신">
-        <span style="font-size:15px">🇺🇸</span>
         <span class="fx-label">USD/KRW</span>
         <span class="fx-val" id="fx-val">—</span>
-        <span class="fx-src" id="fx-src"></span>
+        <span class="fx-src" id="fx-src" style="display:none;"></span>
       </div>
       <div class="year-btns" id="year-btns">
         <button class="year-btn" onclick="setYear(2025,this)">2025</button>
