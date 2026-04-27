@@ -331,6 +331,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
     <div class="sub-nav open" id="holdings-subnav">
       <div class="sub-item active" id="subnav-all" onclick="switchHoldings('all',this)">📑 전체 종목</div>
       <div class="sub-item" id="subnav-div" onclick="switchHoldings('div',this)">💵 배당 종목</div>
+      <div class="sub-item" id="subnav-divsum" onclick="switchHoldings('divsum',this)">💰 계좌별 배당 합계</div>
       <div class="sub-item" id="subnav-heatmap" onclick="switchHoldings('heatmap',this)">📊 보유종목 히트맵</div>
     </div>
   </div>
@@ -593,6 +594,26 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
       </table>
     </div>
   </div>
+
+  <!-- 계좌별 배당 합계 -->
+  <div class="page" id="page-holdings-divsum" style="display:none;">
+    <div class="hold-section-title">💰 계좌별 배당 합계 <span>계좌별 월별 배당 합산 (₩ 기준)</span></div>
+    <div class="htable-wrap" style="overflow-x:auto;">
+      <table style="min-width:1100px;">
+        <thead>
+          <tr>
+            <th style="text-align:left;min-width:130px;">계좌</th>
+            <th class="r">연배당(예상)</th>
+            <th class="r">1월</th><th class="r">2월</th><th class="r">3월</th><th class="r">4월</th>
+            <th class="r">5월</th><th class="r">6월</th><th class="r">7월</th><th class="r">8월</th>
+            <th class="r">9월</th><th class="r">10월</th><th class="r">11월</th><th class="r">12월</th>
+            <th class="r" style="color:var(--gold);">합계</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-divsum"></tbody>
+      </table>
+    </div>
+  </div>
   <!-- 보유종목 히트맵 -->
   <div class="page" id="page-holdings-heatmap">
     <div class="hold-section-title">📊 보유종목 히트맵 <span>수익률 기준 색상 · 박스 크기 = 평가금액</span></div>
@@ -602,7 +623,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
       <div class="hm-tab" id="phtab-san"  onclick="switchPortHeatmap('san')">🔵 산이계좌</div>
       <div class="hm-tab" id="phtab-boy"  onclick="switchPortHeatmap('boy')">🩷 보연씌계좌</div>
     </div>
-    <div style="display:flex;gap:16px;align-items:flex-start;">
+    <div style="display:flex;gap:16px;align-items:flex-end;">
       <div id="port-heatmap-wrap" style="flex:7;min-width:0;height:100%;"></div>
       <!-- 비중 도넛차트 패널 -->
       <div class="port-donut-panel" id="port-donut-panel" style="flex:3;width:auto;">
@@ -1655,7 +1676,7 @@ function renderTrend(){
   trendChart=new Chart(ctx,{
     type:'line',
     data:{labels,datasets:[
-      {label:'우리집 총자산',data:totalArr,borderColor:'#f59e0b',backgroundColor:gT,borderWidth:2.5,pointRadius:pt,pointHoverRadius:6,fill:true,tension:0.35,spanGaps:false,hidden:!seriesOn.total,order:1},
+      {label:'우리집 총자산',data:totalArr,borderColor:'#f59e0b',backgroundColor:'transparent',borderWidth:2.5,pointRadius:pt,pointHoverRadius:6,fill:false,tension:0.35,spanGaps:false,hidden:!seriesOn.total,order:1},
       {label:'총원금',data:buyArr,borderColor:'rgba(245,158,11,0.6)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[5,4],pointRadius:0,pointHoverRadius:4,fill:false,tension:0,spanGaps:true,hidden:!seriesOn.buy,order:0},
       {label:'산이계좌',data:sanArr,borderColor:'#38bdf8',backgroundColor:gS,borderWidth:2,pointRadius:pt,pointHoverRadius:5,fill:false,tension:0.35,spanGaps:false,hidden:!seriesOn.san,order:2},
       {label:'내계좌',data:naeArr,borderColor:'#a78bfa',backgroundColor:'transparent',borderWidth:2,pointRadius:pt,pointHoverRadius:5,fill:false,tension:0.35,spanGaps:false,hidden:!seriesOn.nae,order:3},
@@ -1873,6 +1894,69 @@ function renderHoldingsDiv(){
       tbody.appendChild(tr);
     });
   });
+}
+
+// ══════════════════════════════════════════
+//  계좌별 배당 합계
+// ══════════════════════════════════════════
+function renderHoldingsDivSum(){
+  const tbody=document.getElementById('tbody-divsum');
+  if(!tbody) return;
+  tbody.innerHTML='';
+  // ₩문자열 → 숫자
+  function parseW(s){
+    if(!s||s==='—') return null;
+    const n=parseFloat(s.replace(/[₩,]/g,''));
+    return isNaN(n)?null:n;
+  }
+  const grandMon=Array(12).fill(0);
+  const grandMonHas=Array(12).fill(false);
+  let grandAnn=0;
+  HOLDINGS_DIV.forEach(sec=>{
+    const monTot=Array(12).fill(null);
+    let annTot=0;
+    sec.items.forEach(item=>{
+      const ann=parseW(item.annual);
+      if(ann!==null) annTot+=ann;
+      for(let i=0;i<12;i++){
+        const v=(item.m&&item.m[i]!=null)?parseW(item.m[i]):null;
+        if(v!==null){ monTot[i]=(monTot[i]||0)+v; }
+      }
+    });
+    // 행합계 = null이 아닌 월들의 합
+    const rowTot=monTot.reduce((a,v)=>a+(v||0),0);
+    grandAnn+=annTot;
+    for(let i=0;i<12;i++){
+      if(monTot[i]!==null){ grandMon[i]+=monTot[i]; grandMonHas[i]=true; }
+    }
+    // 계좌 행
+    const tr=document.createElement('tr');
+    const annCell=annTot>0?`<span style="color:var(--accent)">₩${Math.round(annTot).toLocaleString()}</span>`:'<span style="color:var(--text-muted)">—</span>';
+    const monCells=monTot.map(v=>{
+      if(v===null) return `<td class="td-month" style="color:var(--text-muted)">—</td>`;
+      if(v===0) return `<td class="td-month" style="color:var(--text-muted)">₩0</td>`;
+      return `<td class="td-month">₩${Math.round(v).toLocaleString()}</td>`;
+    }).join('');
+    const totCell=rowTot>0?`<b style="color:var(--gold)">₩${Math.round(rowTot).toLocaleString()}</b>`:'<span style="color:var(--text-muted)">—</span>';
+    tr.innerHTML=`<td class="td-name"><span class="acc-badge" style="background:${sec.color}22;border:1px solid ${sec.color}55;color:${sec.color};">${sec.acc}</span></td>`
+      +`<td class="td-div">${annCell}</td>`
+      +monCells
+      +`<td class="td-div">${totCell}</td>`;
+    tbody.appendChild(tr);
+  });
+  // 전체 합계 행
+  const grandTr=document.createElement('tr');
+  grandTr.style.cssText='border-top:2px solid var(--border2);background:var(--surface2);';
+  const grandMonCells=grandMon.map((v,i)=>{
+    if(!grandMonHas[i]) return `<td class="td-month" style="color:var(--text-muted)">—</td>`;
+    return `<td class="td-month" style="color:var(--gold);font-weight:700">₩${Math.round(v).toLocaleString()}</td>`;
+  }).join('');
+  const grandRowTot=grandMon.reduce((a,v)=>a+v,0);
+  grandTr.innerHTML=`<td class="td-name" style="font-weight:800;color:var(--gold)">📊 전체 합계</td>`
+    +`<td class="td-div" style="color:var(--gold);font-weight:800">₩${Math.round(grandAnn).toLocaleString()}</td>`
+    +grandMonCells
+    +`<td class="td-div" style="color:var(--gold);font-weight:800">₩${Math.round(grandRowTot).toLocaleString()}</td>`;
+  tbody.appendChild(grandTr);
 }
 
 // ══════════════════════════════════════════
@@ -2114,15 +2198,16 @@ function switchHoldings(type,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('nav-holdings').classList.add('active');
-  ['all','div','heatmap'].forEach(t=>{
+  ['all','div','divsum','heatmap'].forEach(t=>{
     const pg=document.getElementById('page-holdings-'+t);
     if(pg){ pg.classList.add('active'); pg.style.display=(t===type)?'block':'none'; }
   });
   document.getElementById('year-btns').style.display='none';
-  const titles={all:'종목현황 — 전체',div:'종목현황 — 배당',heatmap:'종목현황 — 히트맵'};
+  const titles={all:'종목현황 — 전체',div:'종목현황 — 배당',divsum:'종목현황 — 계좌별 배당 합계',heatmap:'종목현황 — 히트맵'};
   setEl('page-title',titles[type]||'종목현황');
   if(type==='all') renderHoldingsAll();
   else if(type==='div') renderHoldingsDiv();
+  else if(type==='divsum') renderHoldingsDivSum();
   else if(type==='heatmap'){renderPortDonut(currentPortHmTab||'all');requestAnimationFrame(function(){renderPortHeatmap(currentPortHmTab||'all');});}
 }
 function setYear(y,btn){
@@ -2301,21 +2386,24 @@ function renderPortHeatmap(tab){
     return;
   }
 
-  // 4. 색상
+  // 4. 색상 (finviz 스타일: 수익=초록, 손실=빨강, 그라데이션)
   function rateColor(v){
-    // 수익(+): 0%→연한빨강, 높을수록→진한빨강 (핀비즈 스타일)
-    if(v>=40)  return {bg:'#7f1d1d',fg:'#ffffff'};
-    if(v>=25)  return {bg:'#991b1b',fg:'#ffffff'};
-    if(v>=15)  return {bg:'#b91c1c',fg:'#ffffff'};
-    if(v>=8)   return {bg:'#dc2626',fg:'#ffffff'};
-    if(v>=3)   return {bg:'#ef4444',fg:'#ffffff'};
-    if(v>=0)   return {bg:'#fca5a5',fg:'#7f1d1d'};
-    // 손실(-): 0%→연한초록, 낮을수록→진한초록
-    if(v>=-3)  return {bg:'#86efac',fg:'#14532d'};
-    if(v>=-8)  return {bg:'#22c55e',fg:'#ffffff'};
-    if(v>=-15) return {bg:'#16a34a',fg:'#ffffff'};
-    if(v>=-25) return {bg:'#15803d',fg:'#dcfce7'};
-    return       {bg:'#14532d',fg:'#bbf7d0'};
+    // 수익(+): 연한초록 → 진한초록
+    if(v>=30)  return {bg:'#00AB00',fg:'#ffffff'};  // 매우 진한 초록
+    if(v>=20)  return {bg:'#009800',fg:'#ffffff'};  // 진한 초록
+    if(v>=15)  return {bg:'#008800',fg:'#ffffff'};
+    if(v>=10)  return {bg:'#007B00',fg:'#ffffff'};  // 중간 초록
+    if(v>=5)   return {bg:'#005E00',fg:'#ffffff'};
+    if(v>=2)   return {bg:'#004100',fg:'#ffffff'};  // 연한 초록
+    if(v>=0)   return {bg:'#001100',fg:'#ffffff'};  // 아주 연한 초록
+    // 손실(-): 연한빨강 → 진한빨강
+    if(v>=-2)  return {bg:'#400000',fg:'#ffffff'};  // 아주 연한 빨강
+    if(v>=-5)  return {bg:'#760000',fg:'#ffffff'};  // 연한 빨강
+    if(v>=-10) return {bg:'#960000',fg:'#ffffff'};
+    if(v>=-15) return {bg:'#B60000',fg:'#ffffff'};  // 중간 빨강
+    if(v>=-20) return {bg:'#D70000',fg:'#ffffff'};  // 진한 빨강
+    if(v>=-30) return {bg:'#ED0000',fg:'#ffffff'};
+    return       {bg:'#FF0A0A',fg:'#fed7d7'};       // 매우 진한 빨강
   }
 
   // 5. Squarified Treemap — iterative (빈공간/겹침 없음)
@@ -2475,12 +2563,13 @@ function renderPortHeatmap(tab){
   }
 
   var legend='<div style="display:flex;align-items:center;gap:4px;margin-bottom:8px;flex-wrap:wrap;font-size:12px;color:var(--text-muted);">'
-    +'<span style="background:#7f1d1d;color:#fff;padding:1px 7px;border-radius:3px;">수익+++</span>'
-    +'<span style="background:#ef4444;color:#fff;padding:1px 7px;border-radius:3px;">수익+</span>'
-    +'<span style="background:#fca5a5;color:#7f1d1d;padding:1px 7px;border-radius:3px;">수익~0</span>'
-    +'<span style="background:#86efac;color:#14532d;padding:1px 7px;border-radius:3px;">손실~0</span>'
-    +'<span style="background:#22c55e;color:#fff;padding:1px 7px;border-radius:3px;">손실-</span>'
-    +'<span style="background:#14532d;color:#bbf7d0;padding:1px 7px;border-radius:3px;">손실---</span>'
+    +'<span style="background:#00AB00;color:#fff;padding:1px 7px;border-radius:3px;">+30%</span>'
+    +'<span style="background:#008800;color:#fff;padding:1px 7px;border-radius:3px;">+20%</span>'
+    +'<span style="background:#005E00;color:#fff;padding:1px 7px;border-radius:3px;">+10%</span>'
+    +'<span style="background:#001100;color:#276749;padding:1px 7px;border-radius:3px;">0%</span>'
+    +'<span style="background:#B60000;color:#742a2a;padding:1px 7px;border-radius:3px;">-10%</span>'
+    +'<span style="background:#ED0000;color:#fff;padding:1px 7px;border-radius:3px;">-20%</span>'
+    +'<span style="background:#FF0A0A;color:#fed7d7;padding:1px 7px;border-radius:3px;">-30%</span>'
     +'<span style="margin-left:auto;font-family:DM Mono,monospace;">총 '+rows.length+'종목 · 박스크기=평가금액</span>'
     +'</div>';
 
