@@ -2,8 +2,8 @@ name: 히트맵 자동 캡처
 
 on:
   schedule:
-    # 미국장 마감 후 캡처: KST 화~토 07:00 = UTC 월~금 22:00
-    - cron: '0 22 * * 1-5'
+    # 미국장 마감 후 캡처: KST 화~토 06:00 = UTC 월~금 21:00
+    - cron: '0 21 * * 1-5'
     # 한국장 마감 후 캡처: KST 월~금 16:00 = UTC 월~금 07:00
     - cron: '0 7 * * 1-5'
   workflow_dispatch:
@@ -43,7 +43,7 @@ jobs:
             echo "수동 실행 → 전체 캡처"
           else
             UTC_HOUR=$(date +%H)
-            if [ "$UTC_HOUR" = "22" ] || [ "$UTC_HOUR" = "23" ] || [ "$UTC_HOUR" = "00" ]; then
+            if [ "$UTC_HOUR" = "21" ] || [ "$UTC_HOUR" = "22" ] || [ "$UTC_HOUR" = "23" ]; then
               echo "type=US" >> $GITHUB_OUTPUT
               echo "스케줄 실행 → 미국장 캡처"
             else
