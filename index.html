@@ -1708,8 +1708,8 @@ function renderTrend(){
   // 포인트 크기: 데이터 수가 적으면 동그라미 표시, 많으면 숨김
   const ptCount = labels.length;
   const pt = currentPeriod==='yearly' ? 4
-    : currentPeriod==='daily' ? (ptCount<=60?3:0)
-    : (ptCount<=60?3:0); // monthly도 동일
+    : currentPeriod==='daily' ? (ptCount<=60?4:0)
+    : (ptCount<=60?4:0); // monthly도 동일
 
   // x축 tick callback
   const xTickCb = currentPeriod==='daily'
