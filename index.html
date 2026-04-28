@@ -25,7 +25,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .brand-title{font-size:17px;font-weight:700;line-height:1.4;}
 .brand-sub{font-size:12px;color:var(--text-muted);margin-top:3px;font-family:'DM Mono',monospace;}
 .nav-section{padding:14px 10px 4px;}
-.nav-label{font-size:14px;font-weight:700;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;padding:0 8px;margin-bottom:4px;}
+.nav-label{font-size:20px;font-weight:700;color:fff(--text-muted);letter-spacing:1px;text-transform:uppercase;padding:0 8px;margin-bottom:4px;}
 .nav-item{display:flex;align-items:center;gap:9px;padding:10px 10px;border-radius:8px;cursor:pointer;color:var(--text-sub);font-size:15px;font-weight:500;transition:all .16s;margin-bottom:2px;border:1px solid transparent;position:relative;}
 .nav-item:hover{background:var(--surface);color:var(--text);}
 .nav-item.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(56,189,248,.25);}
@@ -51,7 +51,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 
 /* TOPBAR */
 .topbar{height:56px;background:var(--sidebar);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;position:sticky;top:0;z-index:100;gap:12px;}
-.topbar-title{font-size:17px;font-weight:700;}
+.topbar-title{font-size:25px;font-weight:700;}
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
 .fx-badge{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px 14px;cursor:pointer;}
 .fx-badge:hover{border-color:var(--border2);}
@@ -143,7 +143,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .idx-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
 .idx-title{font-size:16px;font-weight:800;color:var(--text);}
 .idx-update{font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;background:var(--surface2);padding:2px 8px;border-radius:5px;}
-.idx-group-label{font-size:14px;font-weight:700;color:var(--text-muted);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;}
+.idx-group-label{font-size:20px;font-weight:700;color:fff(--text-muted);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;}
 .idx-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;}
 @media(max-width:900px){.idx-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:600px){.idx-grid{grid-template-columns:1fr 1fr;}}
@@ -153,7 +153,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .idx-card.up::before{background:linear-gradient(90deg,var(--red),transparent);}
 .idx-card.down::before{background:linear-gradient(90deg,var(--green),transparent);}
 .idx-card.flat::before{background:linear-gradient(90deg,var(--text-muted),transparent);}
-.idx-name{font-size:13px;color:var(--text-muted);font-weight:700;margin-bottom:6px;letter-spacing:.3px;}
+.idx-name{font-size:20px;color:var(--text);font-weight:700;margin-bottom:6px;letter-spacing:.3px;}
 .idx-price{font-size:24px;font-weight:800;font-family:'DM Mono',monospace;color:var(--text);line-height:1.15;letter-spacing:-.5px;}
 .idx-change-row{display:flex;align-items:center;gap:6px;margin-top:5px;}
 .idx-chg{font-size:16px;font-weight:700;font-family:'DM Mono',monospace;}
@@ -447,7 +447,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
     <button class="refresh-btn" onclick="loadIndices()" style="margin-left:8px;">🔄 새로고침</button>
   </div>
 
-  <div class="idx-group-label">🇺🇸 미국 시장</div>
+  <div class="idx-group-label">미국 시장</div>
   <div class="idx-grid" id="idx-grid-us">
     <div class="idx-card skeleton-card" id="idx-dji"><div class="idx-skeleton"></div></div>
     <div class="idx-card skeleton-card" id="idx-spx"><div class="idx-skeleton"></div></div>
@@ -455,7 +455,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
     <div class="idx-card skeleton-card" id="idx-rut"><div class="idx-skeleton"></div></div>
   </div>
 
-  <div class="idx-group-label" style="margin-top:22px;">🇰🇷 국내 시장</div>
+  <div class="idx-group-label" style="margin-top:22px;">국내 시장</div>
   <div class="idx-grid" id="idx-grid-kr">
     <div class="idx-card skeleton-card" id="idx-ks11"><div class="idx-skeleton"></div></div>
     <div class="idx-card skeleton-card" id="idx-kq11"><div class="idx-skeleton"></div></div>
@@ -1421,7 +1421,7 @@ function renderFxCards(){
   }
   const cards = [
     { id:'usdkrw', name:'USD/KRW', label:'원/달러', data:fx.usdkrw, unit:'원', decimals:2 },
-    { id:'jpykrw', name:'JPY/KRW', label:'원/엔(100엔)', data:fx.jpykrw, unit:'원', decimals:2 },
+    { id:'jpykrw', name:'JPY/KRW', label:'원/엔', data:fx.jpykrw, unit:'원', decimals:2 },
   ];
   cards.forEach(c=>{
     const el = document.getElementById('idx-'+c.id);
