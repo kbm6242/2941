@@ -306,6 +306,19 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
   .cards-top{grid-template-columns:1fr 1fr;}
 }
 
+/* ── 시장뉴스 페이지 ── */
+.mn-header{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap;}
+.mn-title{font-size:16px;font-weight:800;color:var(--text);}
+.mn-update{font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;background:var(--surface2);padding:2px 8px;border-radius:5px;}
+.mn-section-label{font-size:18px;font-weight:800;color:var(--text);margin:20px 0 10px;}
+.mn-outer-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.mn-card{padding:12px 16px;cursor:pointer;transition:background .15s;display:flex;align-items:baseline;gap:12px;color:var(--text);border-bottom:1px solid var(--border);}
+.mn-card:last-child{border-bottom:none;}
+.mn-card:hover{background:var(--surface2);}
+.mn-card-title{font-size:14px;font-weight:600;color:var(--text);line-height:1.55;flex:1;}
+.mn-card-date{font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;white-space:nowrap;min-width:82px;text-align:right;flex-shrink:0;}
+.mn-empty{font-size:13px;color:var(--text-muted);padding:30px 0;text-align:center;}
+
 /* ── 지수 티커 슬라이더 ── */
 .idx-ticker{
   display:flex;align-items:center;gap:8px;
@@ -359,6 +372,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
   <div class="nav-section">
     <div class="nav-label">마켓</div>
     <div class="nav-item" onclick="switchPage('indices',this)"><span class="nav-icon">📊</span><span>주요 지수</span></div>
+    <div class="nav-item" onclick="switchPage('marketnews',this)"><span class="nav-icon">📰</span><span>시장 뉴스</span></div>
     <div class="nav-item" onclick="switchPage('heatmap',this)"><span class="nav-icon">🌐</span><span>히트맵</span></div>
   </div>
   <div class="nav-section">
@@ -408,7 +422,24 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
   </div>
 
   <!-- 히트맵 -->
-  <!-- ══ 주요 지수 페이지 ══ -->
+  <!-- ══ 시장 뉴스 페이지 ══ -->
+<div class="page" id="page-marketnews">
+  <div class="mn-header">
+    <div class="mn-title">📰 시장 뉴스</div>
+    <span class="mn-update" id="mn-update-time">—</span>
+    <button class="refresh-btn" onclick="loadMarketNews(true)" style="margin-left:8px;">🔄 새로고침</button>
+  </div>
+  <div style="font-size:22px;font-weight:800;color:#eef2f8;margin:0 0 10px;">미국 시장</div>
+  <div class="mn-grid" id="mn-grid-us">
+    <div class="mn-empty">데이터 로딩 중...</div>
+  </div>
+  <div class="mn-section-label" style="font-size:22px;font-weight:800;color:#eef2f8;margin:22px 0 10px;"> 아시아 시장</div>
+  <div class="mn-grid" id="mn-grid-asia">
+    <div class="mn-empty">데이터 로딩 중...</div>
+  </div>
+</div>
+
+<!-- ══ 주요 지수 페이지 ══ -->
 <div class="page" id="page-indices">
   <div class="idx-header">
     <div class="idx-title">📊 주요 지수 현황</div>
@@ -699,6 +730,7 @@ const GID_FAM  = '397153450';   // 우리가족계좌정리
 const GID_2025 = '1399679566';  // 2025탭 (월별)
 const GID_2026 = '402703868';   // 2026탭
 const GID_LOG  = '231310426';   // 일별자산기록 (Apps Script 자동저장)
+const GID_MARKET_NEWS = '1766819149'; // MarketNews 시트 (GID 확인 후 교체)
 
 // ★ 연도별 X축 라벨 (13개: 전년 12월 ~ 당해 12월)
 const LABELS_2025 = ['25.12','25.1','25.2','25.3','25.4','25.5','25.6','25.7','25.8','25.9','25.10','25.11','25.12'];
@@ -2144,6 +2176,65 @@ const IDX_LIST = [
 ];
 let idxLastLoad = 0;
 
+// ══════════════════════════════════════════
+//  시장 뉴스 (Google News RSS → Apps Script → 구글시트 → HTML)
+// ══════════════════════════════════════════
+let mnLastLoad = 0;
+
+async function loadMarketNews(force=false){
+  const now = Date.now();
+  if(!force && now - mnLastLoad < 60000 && mnLastLoad > 0) return;
+  mnLastLoad = now;
+
+  const usGrid   = document.getElementById('mn-grid-us');
+  const asiaGrid = document.getElementById('mn-grid-asia');
+  const updateEl = document.getElementById('mn-update-time');
+  if(usGrid)   usGrid.innerHTML  = '<div class="mn-empty">로딩 중...</div>';
+  if(asiaGrid) asiaGrid.innerHTML = '<div class="mn-empty">로딩 중...</div>';
+
+  try {
+    const csv = await fetchPub(GID_MARKET_NEWS, 'A1:D11', 9000);
+    const rows = parseCSV(csv);
+    if(!rows || rows.length === 0) throw new Error('데이터 없음');
+
+    // A1: 업데이트 시간
+    const updatedAt = (rows[0]||[])[0] || '';
+    if(updateEl) updateEl.textContent = updatedAt;
+
+    // A2:D6 → 미국 뉴스 (row index 1~5)
+    // A7:D11 → 아시아 뉴스 (row index 6~10)
+    const renderCards = (grid, dataRows) => {
+      if(!grid) return;
+      const items = dataRows.filter(r => r[1] && r[1].trim());
+      if(!items.length){ grid.innerHTML = '<div style="font-size:13px;color:#4a6480;padding:30px 0;text-align:center;">뉴스를 불러올 수 없습니다.</div>'; return; }
+      const cards = items.map((r,i) => {
+          const title = (r[1]||'').replace(/\s*-\s*[^-]+$/, '').trim();
+          const date  = r[2] || '';
+          const link  = (r[3] || '').trim();
+          const isLast = i === items.length - 1;
+          const borderBottom = isLast ? 'none' : '1px solid #1e3048';
+          const onclick = link ? `this.style.background='rgba(56,189,248,0.06)';setTimeout(()=>this.style.background='',300);window.open('${link}','_blank','noopener')` : '';
+          return `<div onclick="${onclick}"
+            onmouseenter="this.style.background='rgba(255,255,255,0.04)';this.style.cursor='pointer';"
+            onmouseleave="this.style.background='';"
+            style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:${borderBottom};color:#eef2f8;transition:background .15s;">
+            <div style="flex:1;font-size:14px;font-weight:600;color:#eef2f8;line-height:1.55;">${title}</div>
+            <div style="font-size:11px;color:#4a6480;font-family:'DM Mono',monospace;white-space:nowrap;min-width:82px;text-align:right;flex-shrink:0;">${date}</div>
+          </div>`;
+        }).join('');
+      grid.innerHTML = `<div style="background:#131c28;border:1px solid #1e3048;border-radius:12px;overflow:hidden;">${cards}</div>`;
+     };
+
+    renderCards(usGrid,   rows.slice(1, 6));   // row 2~6 (index 1~5)
+    renderCards(asiaGrid, rows.slice(6, 11));  // row 7~11 (index 6~10)
+
+  } catch(e) {
+    const msg = `<div class="mn-empty">불러오기 실패: ${e.message}<br>Apps Script 설정 및 GID_MARKET_NEWS를 확인하세요.</div>`;
+    if(usGrid)   usGrid.innerHTML  = msg;
+    if(asiaGrid) asiaGrid.innerHTML = '';
+  }
+}
+
 async function loadIndices(){
   const now = Date.now();
   if(now - idxLastLoad < 30000 && idxLastLoad > 0) return;
@@ -2309,9 +2400,10 @@ function switchPage(page,el){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   if(el)el.classList.add('active');
-  const titles={indices:'주요 지수',heatmap:'히트맵',trend:'자산 추이',dividend:'배당'};
+  const titles={indices:'주요 지수',marketnews:'시장 뉴스',heatmap:'히트맵',trend:'자산 추이',dividend:'배당'};
   setEl('page-title',titles[page]||'종목현황');
   document.getElementById('year-btns').style.display=['indices','heatmap','holdings-all','holdings-div'].includes(page)?'none':'flex';
+  if(page==='marketnews') loadMarketNews(false);
   if(page==='trend')    renderTrend();
   if(page==='dividend') renderDividend();
   if(page==='holdings-all')renderHoldingsAll();
