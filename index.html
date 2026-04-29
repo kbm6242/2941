@@ -143,7 +143,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .idx-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
 .idx-title{font-size:16px;font-weight:800;color:var(--text);}
 .idx-update{font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;background:var(--surface2);padding:2px 8px;border-radius:5px;}
-.idx-group-label{font-size:20px;font-weight:700;color:var(--text-muted);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;}
+.idx-group-label{font-size:20px;font-weight:700;color:var(--text);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;}
 .idx-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;}
 @media(max-width:900px){.idx-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:600px){.idx-grid{grid-template-columns:1fr 1fr;}}
@@ -153,7 +153,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .idx-card.up::before{background:linear-gradient(90deg,var(--red),transparent);}
 .idx-card.down::before{background:linear-gradient(90deg,var(--green),transparent);}
 .idx-card.flat::before{background:linear-gradient(90deg,var(--text-muted),transparent);}
-.idx-name{font-size:20px;color:var(--text-muted);font-weight:700;margin-bottom:6px;letter-spacing:.3px;}
+.idx-name{font-size:20px;color:var(--text);font-weight:700;margin-bottom:6px;letter-spacing:.3px;}
 .idx-price{font-size:24px;font-weight:800;font-family:'DM Mono',monospace;color:var(--text);line-height:1.15;letter-spacing:-.5px;}
 .idx-change-row{display:flex;align-items:center;gap:6px;margin-top:5px;}
 .idx-chg{font-size:16px;font-weight:700;font-family:'DM Mono',monospace;}
@@ -430,11 +430,11 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
     <span class="mn-update" id="mn-update-time">—</span>
     <button class="refresh-btn" onclick="loadMarketNews(true)" style="margin-left:8px;">🔄 새로고침</button>
   </div>
-  <div style="font-size:18px;font-weight:800;color:#eef2f8;margin:0 0 10px;">🇺🇸 미국 시장</div>
+  <div style="font-size:18px;font-weight:800;color:#eef2f8;margin:0 0 10px;">미국 시장</div>
   <div class="mn-grid" id="mn-grid-us">
     <div class="mn-empty">데이터 로딩 중...</div>
   </div>
-  <div class="mn-section-label" style="font-size:18px;font-weight:800;color:#eef2f8;margin:22px 0 10px;">🌏 아시아 시장</div>
+  <div class="mn-section-label" style="font-size:18px;font-weight:800;color:#eef2f8;margin:22px 0 10px;">아시아 시장</div>
   <div class="mn-grid" id="mn-grid-asia">
     <div class="mn-empty">데이터 로딩 중...</div>
   </div>
@@ -448,7 +448,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
     <button class="refresh-btn" onclick="loadIndices()" style="margin-left:8px;">🔄 새로고침</button>
   </div>
 
-  <div class="idx-group-label">🇺🇸 미국 시장</div>
+  <div class="idx-group-label">미국 시장</div>
   <div class="idx-grid" id="idx-grid-us">
     <div class="idx-card skeleton-card" id="idx-dji"><div class="idx-skeleton"></div></div>
     <div class="idx-card skeleton-card" id="idx-spx"><div class="idx-skeleton"></div></div>
@@ -456,7 +456,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
     <div class="idx-card skeleton-card" id="idx-rut"><div class="idx-skeleton"></div></div>
   </div>
 
-  <div class="idx-group-label" style="margin-top:22px;">🇰🇷 국내 시장</div>
+  <div class="idx-group-label" style="margin-top:22px;">국내 시장</div>
   <div class="idx-grid" id="idx-grid-kr">
     <div class="idx-card skeleton-card" id="idx-ks11"><div class="idx-skeleton"></div></div>
     <div class="idx-card skeleton-card" id="idx-kq11"><div class="idx-skeleton"></div></div>
@@ -474,7 +474,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
       <div class="hm-tab active" id="htab-sp500" onclick="switchHeatmap('sp500')">🇺🇸 S&amp;P 500</div>
       <div class="hm-tab" id="htab-nasdaq" onclick="switchHeatmap('nasdaq')">🖥 Nasdaq 100</div>
       <div class="hm-tab" id="htab-russell" onclick="switchHeatmap('russell')">📊 Russell 2000</div>
-      <div class="hm-tab" id="htab-kospi" onclick="switchHeatmap('kospi')">🇰🇷 코스피</div>
+      <div class="hm-tab" id="htab-kospi" onclick="switchHeatmap('kospi')">코스피</div>
     </div>
     <!-- S&P 500 -->
     <div class="hm-frame-wrap" id="hm-sp500">
@@ -612,7 +612,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
       <div>
         <div class="div-total-label" id="div-year-label">2025년 우리집 배당 합계</div>
         <div class="div-total-val" id="div-total">—</div>
-        <div id="div-total-usd" style="font-size:25px;font-weight:700;color:#38bdf8;font-family:'DM Mono',monospace;margin-top:2px;margin-bottom:6px;">—</div>
+        <div id="div-total-usd" style="font-size:25px;font-weight:700;color:#f59e0b;font-family:'DM Mono',monospace;margin-top:2px;margin-bottom:6px;">—</div>
         <div class="div-rate-tag">월평균 <span id="div-avg">—</span><span id="div-avg-usd" style="font-size:13px;color:#38bdf8;font-family:'DM Mono',monospace;margin-left:6px;"></span></div>
       </div>
       <!-- 달성률: 배당합계와 통계 사이 -->
@@ -1443,7 +1443,7 @@ function renderFxCards(){
   }
   const cards = [
     { id:'usdkrw', name:'USD/KRW', label:'원/달러', data:fx.usdkrw, unit:'원', decimals:2 },
-    { id:'jpykrw', name:'JPY/KRW', label:'원/엔(100엔)', data:fx.jpykrw, unit:'원', decimals:2 },
+    { id:'jpykrw', name:'JPY/KRW', label:'원/엔', data:fx.jpykrw, unit:'원', decimals:2 },
   ];
   cards.forEach(c=>{
     const el = document.getElementById('idx-'+c.id);
