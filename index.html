@@ -25,7 +25,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .brand-title{font-size:17px;font-weight:700;line-height:1.4;}
 .brand-sub{font-size:12px;color:var(--text-muted);margin-top:3px;font-family:'DM Mono',monospace;}
 .nav-section{padding:14px 10px 4px;}
-.nav-label{font-size:20px;font-weight:700;color:fff(--text-muted);letter-spacing:1px;text-transform:uppercase;padding:0 8px;margin-bottom:4px;}
+.nav-label{font-size:20px;font-weight:700;color:#fff;letter-spacing:1px;text-transform:uppercase;padding:0 8px;margin-bottom:4px;}
 .nav-item{display:flex;align-items:center;gap:9px;padding:10px 10px;border-radius:8px;cursor:pointer;color:var(--text-sub);font-size:15px;font-weight:500;transition:all .16s;margin-bottom:2px;border:1px solid transparent;position:relative;}
 .nav-item:hover{background:var(--surface);color:var(--text);}
 .nav-item.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(56,189,248,.25);}
@@ -143,7 +143,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .idx-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
 .idx-title{font-size:16px;font-weight:800;color:var(--text);}
 .idx-update{font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;background:var(--surface2);padding:2px 8px;border-radius:5px;}
-.idx-group-label{font-size:20px;font-weight:700;color:fff(--text-muted);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;}
+.idx-group-label{font-size:20px;font-weight:700;color:var(--text-muted);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;}
 .idx-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;}
 @media(max-width:900px){.idx-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:600px){.idx-grid{grid-template-columns:1fr 1fr;}}
@@ -153,7 +153,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .idx-card.up::before{background:linear-gradient(90deg,var(--red),transparent);}
 .idx-card.down::before{background:linear-gradient(90deg,var(--green),transparent);}
 .idx-card.flat::before{background:linear-gradient(90deg,var(--text-muted),transparent);}
-.idx-name{font-size:20px;color:var(--text);font-weight:700;margin-bottom:6px;letter-spacing:.3px;}
+.idx-name{font-size:20px;color:var(--text-muted);font-weight:700;margin-bottom:6px;letter-spacing:.3px;}
 .idx-price{font-size:24px;font-weight:800;font-family:'DM Mono',monospace;color:var(--text);line-height:1.15;letter-spacing:-.5px;}
 .idx-change-row{display:flex;align-items:center;gap:6px;margin-top:5px;}
 .idx-chg{font-size:16px;font-weight:700;font-family:'DM Mono',monospace;}
@@ -196,9 +196,10 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .div-stat-label{font-size:12px;color:var(--text-muted);margin-bottom:4px;font-weight:600;}
 .div-stat-val{font-size:17px;font-weight:700;font-family:'DM Mono',monospace;}
 .bar-chart-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;}
-.monthly-bars{display:flex;align-items:flex-end;gap:6px;height:155px;margin-top:10px;}
+.monthly-bars{display:flex;align-items:flex-end;gap:6px;height:186px;margin-top:10px;}
 .m-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;gap:3px;}
-.m-amt{font-size:12px;color:var(--text-sub);font-family:'DM Mono',monospace;text-align:center;min-height:20px;display:flex;align-items:flex-end;}
+.m-amt{font-size:12px;color:var(--text-sub);font-family:'DM Mono',monospace;text-align:center;min-height:34px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1px;}
+.m-amt-usd{font-size:12px;color:#38bdf8;font-family:'DM Mono',monospace;text-align:center;line-height:1.1;}
 .m-bar-wrap{flex:1;width:100%;display:flex;align-items:flex-end;}
 .m-bar{width:100%;background:#1a3555;border-radius:4px 4px 0 0;transition:height .5s cubic-bezier(.23,1,.32,1);}
 .m-bar:hover{background:rgba(56,189,248,.22);}
@@ -429,11 +430,11 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
     <span class="mn-update" id="mn-update-time">—</span>
     <button class="refresh-btn" onclick="loadMarketNews(true)" style="margin-left:8px;">🔄 새로고침</button>
   </div>
-  <div style="font-size:22px;font-weight:800;color:#eef2f8;margin:0 0 10px;">미국 시장</div>
+  <div style="font-size:18px;font-weight:800;color:#eef2f8;margin:0 0 10px;">🇺🇸 미국 시장</div>
   <div class="mn-grid" id="mn-grid-us">
     <div class="mn-empty">데이터 로딩 중...</div>
   </div>
-  <div class="mn-section-label" style="font-size:22px;font-weight:800;color:#eef2f8;margin:22px 0 10px;"> 아시아 시장</div>
+  <div class="mn-section-label" style="font-size:18px;font-weight:800;color:#eef2f8;margin:22px 0 10px;">🌏 아시아 시장</div>
   <div class="mn-grid" id="mn-grid-asia">
     <div class="mn-empty">데이터 로딩 중...</div>
   </div>
@@ -447,7 +448,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
     <button class="refresh-btn" onclick="loadIndices()" style="margin-left:8px;">🔄 새로고침</button>
   </div>
 
-  <div class="idx-group-label">미국 시장</div>
+  <div class="idx-group-label">🇺🇸 미국 시장</div>
   <div class="idx-grid" id="idx-grid-us">
     <div class="idx-card skeleton-card" id="idx-dji"><div class="idx-skeleton"></div></div>
     <div class="idx-card skeleton-card" id="idx-spx"><div class="idx-skeleton"></div></div>
@@ -455,7 +456,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
     <div class="idx-card skeleton-card" id="idx-rut"><div class="idx-skeleton"></div></div>
   </div>
 
-  <div class="idx-group-label" style="margin-top:22px;">국내 시장</div>
+  <div class="idx-group-label" style="margin-top:22px;">🇰🇷 국내 시장</div>
   <div class="idx-grid" id="idx-grid-kr">
     <div class="idx-card skeleton-card" id="idx-ks11"><div class="idx-skeleton"></div></div>
     <div class="idx-card skeleton-card" id="idx-kq11"><div class="idx-skeleton"></div></div>
@@ -611,7 +612,8 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
       <div>
         <div class="div-total-label" id="div-year-label">2025년 우리집 배당 합계</div>
         <div class="div-total-val" id="div-total">—</div>
-        <div class="div-rate-tag">월평균 <span id="div-avg">—</span></div>
+        <div id="div-total-usd" style="font-size:25px;font-weight:700;color:#38bdf8;font-family:'DM Mono',monospace;margin-top:2px;margin-bottom:6px;">—</div>
+        <div class="div-rate-tag">월평균 <span id="div-avg">—</span><span id="div-avg-usd" style="font-size:13px;color:#38bdf8;font-family:'DM Mono',monospace;margin-left:6px;"></span></div>
       </div>
       <!-- 달성률: 배당합계와 통계 사이 -->
       <div class="div-achieve-wrap" id="div-achieve-wrap" style="display:none;padding:0 24px;">
@@ -855,6 +857,9 @@ const SD={
   mon2025:{san:null,nae:null,boy:null},
   mon2026:{san:null,nae:null,boy:null},
   div2026:null,
+  div2025MonthlyUsd:[490,230,258,335,450,222,426,675,571,1118,665,851], // 2025 월별달러(L78:W78)
+  div2026Usd:null,
+  div2026MonthlyUsd:null,
   divRows:{nae:[],gift:[],pension:[],boy:[],san:[]},
   fxRate:1300,
 };
@@ -873,6 +878,7 @@ function fmtCard(n){
 const fmtW=n=>{if(!n||isNaN(n))return'—';const a=Math.abs(n);if(a>=100000000)return(n/100000000).toFixed(2)+'억';if(a>=10000)return Math.round(n/10000)+'만';return Math.round(n).toLocaleString()+'원';};
 const fmtK=n=>{if(n===null||n===undefined||isNaN(n))return'—';const a=Math.abs(n);if(a>=100000000)return(n/100000000).toFixed(2)+'억';if(a>=10000000)return Math.round(n/10000000)+'천만';if(a>=10000)return Math.round(n/10000)+'만';return n.toLocaleString()+'원';};
 const fmtFull=n=>(n===null||isNaN(n))?'—':Math.round(n).toLocaleString()+'원';
+const fmtUsd=n=>{if(!n||isNaN(n))return'—';return '$'+Math.round(n).toLocaleString('en-US');};
 const fmtChg=(c,p)=>{if(!p||!c||isNaN(c)||isNaN(p))return{text:'',cls:'neutral'};const d=c-p,pct=((d/p)*100).toFixed(1),s=d>=0?'+':'';return{text:`${s}${fmtK(d)} (${s}${pct}%)`,cls:d>=0?'up':'down'};};
 const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
 const setChg=(id,o)=>{const e=document.getElementById(id);if(e){e.textContent=o.text;e.className='card-change '+o.cls;}};
@@ -985,6 +991,8 @@ async function loadAllSheetData(){
     fetchPub(GID_2026,'D32:E36'),      // [49] 증여예정 종목명/수량
     fetchPub(GID_2026,'D42:E44'),      // [50] 내계좌 종목명/수량
     fetchPub(GID_2026,'D46:E50'),      // [51] 연금계좌 종목명/수량
+    fetchPub(GID_2026,'D5'),           // [52] 2026 달러 배당 합계
+    fetchPub(GID_2026,'L57:W57'),      // [53] 2026 월별 달러 배당
   ]);
 
   let ok=0;
@@ -1204,6 +1212,20 @@ async function loadAllSheetData(){
     DIVIDENDS[2026]=raw;
     SD.div2026=raw;
   }
+  // [52] 2026 달러 배당 합계 (D5)
+  if(results[52]&&results[52].status==='fulfilled'){
+    const v=parseSingle(results[52].value);
+    if(v!==null) SD.div2026Usd=v;
+  }
+  // [53] 2026 월별 달러 배당 (L57:W57)
+  if(results[53]&&results[53].status==='fulfilled'){
+    const cols=parseCSV(results[53].value);
+    if(cols&&cols[0]) SD.div2026MonthlyUsd=cols[0].map(v=>{
+      if(!v||v===''||v==='-'||v==='—')return null;
+      const n=parseFloat(String(v).replace(/[^0-9.-]/g,''));
+      return isNaN(n)?null:Math.round(n);
+    }).slice(0,12);
+  }
 
   // 종목별 월별 배당 파싱
   // 시트 행 순서 ↔ HOLDINGS_DIV 종목 순서 1:1 매핑
@@ -1421,7 +1443,7 @@ function renderFxCards(){
   }
   const cards = [
     { id:'usdkrw', name:'USD/KRW', label:'원/달러', data:fx.usdkrw, unit:'원', decimals:2 },
-    { id:'jpykrw', name:'JPY/KRW', label:'원/엔', data:fx.jpykrw, unit:'원', decimals:2 },
+    { id:'jpykrw', name:'JPY/KRW', label:'원/엔(100엔)', data:fx.jpykrw, unit:'원', decimals:2 },
   ];
   cards.forEach(c=>{
     const el = document.getElementById('idx-'+c.id);
@@ -1989,14 +2011,43 @@ function renderDividend(){
   const months=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
   const curM=new Date().getMonth()+1;
   setEl('div-year-label',`${currentYear}년 우리집 배당 합계`);
-  setEl('div-total',fmtFull(total));setEl('div-avg',fmtK(avg)+'/월');
+  setEl('div-total',fmtFull(total));
+  const usdTotal=(()=>{
+    if(currentYear===2026){
+      if(SD.div2026Usd!==null)return SD.div2026Usd;
+      return total?Math.round(total/(SD.fxRate||1300)):null;
+    }
+    if(currentYear===2025&&SD.div2025MonthlyUsd){
+      const sum=SD.div2025MonthlyUsd.reduce((s,v)=>s+(v||0),0);
+      return sum>0?sum:null;
+    }
+    return total?Math.round(total/(SD.fxRate||1300)):null;
+  })();
+  setEl('div-total-usd',usdTotal?'$'+Math.round(usdTotal).toLocaleString('en-US'):'—');
+  const avgUsdVal=usdTotal&&valid.length?Math.round(usdTotal/valid.length):null;
+  const avgUsdStr=avgUsdVal?'/$'+avgUsdVal.toLocaleString('en-US'):'';
+  setEl('div-avg',fmtK(avg)+avgUsdStr);
+  const avgEl=document.getElementById('div-avg-usd');if(avgEl)avgEl.textContent='';
   setEl('div-peak-month',months[peakI]);setEl('div-peak-val',fmtK(d[peakI]));
   const maxV=Math.max(...d.map(v=>v||0),1);
   const bars=document.getElementById('monthly-bars');bars.innerHTML='';
   d.forEach((amt,i)=>{
     const isCur=currentYear===2026&&(i+1)===curM;const ok=amt!==null&&amt>0;const hp=ok?Math.max((amt/maxV)*100,4):3;
+    const usdNum=(()=>{
+      if(currentYear===2026){
+        if(SD.div2026MonthlyUsd&&SD.div2026MonthlyUsd[i]!=null)return SD.div2026MonthlyUsd[i];
+        if(ok)return Math.round(amt/(SD.fxRate||1300));
+        return null;
+      }
+      if(currentYear===2025){
+        if(SD.div2025MonthlyUsd&&SD.div2025MonthlyUsd[i]!=null)return SD.div2025MonthlyUsd[i];
+        return null;
+      }
+      return null;
+    })();
+    const usdM=usdNum?'<span class="m-amt-usd">$'+usdNum.toLocaleString('en-US')+'</span>':'';
     const col=document.createElement('div');col.className='m-col';
-    col.innerHTML=`<div class="m-amt">${ok?fmtK(amt):''}</div><div class="m-bar-wrap"><div class="m-bar${isCur?' current':ok?'':' empty'}" style="height:${hp}%"></div></div><div class="m-label">${i+1}</div>`;
+    col.innerHTML=`<div class="m-amt">${ok?'<span>'+fmtK(amt)+'</span>':''}${usdM}</div><div class="m-bar-wrap"><div class="m-bar${isCur?' current':ok?'':' empty'}" style="height:${hp}%"></div></div><div class="m-label">${i+1}</div>`;
     bars.appendChild(col);
   });
   const body=document.getElementById('div-tbl-body');body.innerHTML='';
@@ -2004,7 +2055,19 @@ function renderDividend(){
   [2025,2026].forEach(y=>{
     const row=document.createElement('div');row.className='st-row';const rd=DIVIDENDS[y]||[];
     let cells=`<div style="font-weight:700;font-size:14px;color:${y===currentYear?'var(--accent)':'var(--text-sub)'}">${y}</div>`;
-    rd.forEach(v=>{const isM=v&&v===gMax;const isCur=y===currentYear&&v;cells+=`<div class="st-cell${isM?' hi':isCur?' now':''}">${v?fmtK(v):'—'}</div>`;});
+    rd.forEach((v,ci)=>{const isM=v&&v===gMax;const isCur=y===currentYear&&v;
+      const usdC=(()=>{
+        if(!v)return'';
+        let n=null;
+        if(y===2026){
+          if(SD.div2026MonthlyUsd&&SD.div2026MonthlyUsd[ci]!=null)n=SD.div2026MonthlyUsd[ci];
+          else n=Math.round(v/(SD.fxRate||1300));
+        }else if(y===2025){
+          if(SD.div2025MonthlyUsd&&SD.div2025MonthlyUsd[ci]!=null)n=SD.div2025MonthlyUsd[ci];
+        }
+        return n>0?'<span style="display:block;font-size:11px;color:#38bdf8;opacity:.85;margin-top:1px;">$'+n.toLocaleString('en-US')+'</span>':'';
+      })();
+      cells+=`<div class="st-cell${isM?' hi':isCur?' now':''}">${v?fmtK(v):'—'}${usdC}</div>`;});
     row.innerHTML=cells;body.appendChild(row);
   });
   // 달성률 업데이트
