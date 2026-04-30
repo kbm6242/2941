@@ -41,15 +41,12 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "type=all" >> $GITHUB_OUTPUT
             echo "수동 실행 → 전체 캡처"
+          elif [ "${{ github.event.schedule }}" = "0 21 * * 1-5" ]; then
+            echo "type=US" >> $GITHUB_OUTPUT
+            echo "스케줄 실행 → 미국장 캡처"
           else
-            UTC_HOUR=$(date +%H)
-            if [ "$UTC_HOUR" = "21" ] || [ "$UTC_HOUR" = "22" ] || [ "$UTC_HOUR" = "23" ]; then
-              echo "type=US" >> $GITHUB_OUTPUT
-              echo "스케줄 실행 → 미국장 캡처"
-            else
-              echo "type=KR" >> $GITHUB_OUTPUT
-              echo "스케줄 실행 → 한국장 캡처"
-            fi
+            echo "type=KR" >> $GITHUB_OUTPUT
+            echo "스케줄 실행 → 한국장 캡처"
           fi
 
       - name: 히트맵 캡처
