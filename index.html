@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>산이네 자산관리</title>
+<title>산이네 자산관리 v102</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=DM+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -1765,7 +1765,7 @@ function renderTrend(){
     : currentPeriod==='daily' ? (ptCount<=60?4:0)
     : (ptCount<=60?4:0); // monthly도 동일
 
-  // x축 tick callback
+  // x축 tick callback  ← v102 fix: monthly autoSkip:false 적용
   const xTickCb = currentPeriod==='daily'
     ? (val,idx,ticks)=>{ return labels[idx]||''; }
     : currentPeriod==='monthly'
@@ -1773,9 +1773,10 @@ function renderTrend(){
         const lbl=labels[idx];
         if(!lbl)return '';
         const m=parseInt(lbl.split('.')[0]);
-        // 각 달의 첫 포인트에만 월 라벨 표시
-        const prevM=idx>0?parseInt(labels[idx-1]?.split('.')[0]||0):0;
-        if(idx===0||prevM<m)return m+'월';
+        if(!Number.isFinite(m)||m<1||m>12) return '';
+        // 각 달의 첫 포인트(월이 바뀌는 지점)에만 'n월' 표시
+        const prevM=idx>0?parseInt((labels[idx-1]||'').split('.')[0]||'0'):0;
+        if(idx===0||prevM<m) return m+'월';
         return '';
       }
     : currentPeriod==='yearly'
@@ -1824,7 +1825,16 @@ function renderTrend(){
         }
       },
       scales:{
-        x:{ticks:{color:'#4a6480',font:{size:13},maxTicksLimit:currentPeriod==='daily'?8:(currentPeriod==='monthly'?14:30),callback:xTickCb},grid:{color:'#131c28'}},
+        x:{ticks:{
+            color:'#4a6480',
+            font:{size:13},
+            // v102 fix: monthly는 autoSkip 끄고 월 라벨 누락 방지
+            autoSkip: currentPeriod==='monthly' ? false : true,
+            maxRotation: 0,
+            minRotation: 0,
+            maxTicksLimit: currentPeriod==='daily' ? 8 : (currentPeriod==='monthly' ? 100 : 30),
+            callback:xTickCb
+          },grid:{color:'#131c28'}},
         y:{ticks:{color:'#4a6480',font:{size:13},callback:v=>v>=100000000?(v/100000000).toFixed(1)+'억':(v/10000000).toFixed(0)+'천만'},grid:{color:'#131c28'}}
       }
     }
