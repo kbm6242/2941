@@ -460,6 +460,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
   <div class="idx-grid" id="idx-grid-kr">
     <div class="idx-card skeleton-card" id="idx-ks11"><div class="idx-skeleton"></div></div>
     <div class="idx-card skeleton-card" id="idx-kq11"><div class="idx-skeleton"></div></div>
+    <div class="idx-card skeleton-card" id="idx-krxgold"><div class="idx-skeleton"></div></div>
   </div>
 
   <div class="idx-group-label" style="margin-top:22px;">💱 환율</div>
@@ -970,7 +971,7 @@ async function loadAllSheetData(){
     fetchPub(GID_2026,'J8:J56'),  // [28] J열 전체 (연배당금액)
     fetchPub(GID_LOG,'A2:F500'),    // [29] 일별자산기록 전체
     fetchPub(GID_FAM,'C54'),           // [30] 총 매입원금
-    fetchPub(GID_LOG,'L2:M8'),         // [31] 주요지수 가격/등락률 (L8까지 여유)
+    fetchPub(GID_LOG,'L2:M10'),        // [31] 주요지수 가격/등락률 (L10=KRX금)
     fetchPub(GID_FAM,'C8:I20'),        // [32] 내계좌 종목
     fetchPub(GID_FAM,'C22:I26'),       // [33] 증여예정 종목
     fetchPub(GID_FAM,'C28:I32'),       // [34] 연금계좌 종목
@@ -1108,7 +1109,8 @@ async function loadAllSheetData(){
       const rows=parseCSV(results[31].value);
       const mktData=[];
       IDX_LIST.forEach((ix,i)=>{
-        const r=rows[i]||[];
+        const rowI = (ix.rowIdx !== undefined) ? ix.rowIdx : i;
+        const r=rows[rowI]||[];
         const price=toNum(r[0]),pct=toNum(r[1]);
         if(price!==null) mktData.push({id:ix.id,price,pct:pct||0});
       });
@@ -1420,7 +1422,7 @@ function renderMarketIndex() {
     if(!el) return;
     el.className = 'idx-card ' + dir;
     el.innerHTML = `
-      <div class="idx-name">${ix.name} <a href="https://www.google.com/finance/quote/${ix.gf}" target="_blank" style="font-size:11px;color:var(--accent);text-decoration:none;">구글 파이낸스 ↗</a></div>
+      <div class="idx-name">${ix.name}${ix.gf ? ` <a href="https://www.google.com/finance/quote/${ix.gf}" target="_blank" style="font-size:11px;color:var(--accent);text-decoration:none;">구글 파이낸스 ↗</a>` : ''}</div>
       <div class="idx-price">${fmtP(price)}</div>
       <div class="idx-change-row">
         <span class="idx-pct ${dir}">${arrow} ${pctStr}</span>
@@ -2246,6 +2248,7 @@ const IDX_LIST = [
   {id:'rut',  name:'러셀 2000',  sym:'^RUT',  group:'us', gf:'RUT:INDEXRUSSELL'},
   {id:'ks11', name:'코스피',      sym:'^KS11', group:'kr', gf:'KOSPI:KRX'},
   {id:'kq11', name:'코스닥',      sym:'^KQ11', group:'kr', gf:'KOSDAQ:KOSDAQ'},
+  {id:'krxgold', name:'KRX금',    sym:'KRXGOLD', group:'kr', gf:null, rowIdx:8},
 ];
 let idxLastLoad = 0;
 
@@ -2408,7 +2411,7 @@ function renderIdxCard(ix, q){
     el.innerHTML=`
       <div class="idx-name">${ix.name}</div>
       <div class="idx-price">—</div>
-      <div class="idx-time">데이터 없음 · <a href="https://www.google.com/finance/quote/${ix.gf}" target="_blank" style="color:var(--accent)">구글 파이낸스 ↗</a></div>`;
+      <div class="idx-time">데이터 없음${ix.gf ? ` · <a href="https://www.google.com/finance/quote/${ix.gf}" target="_blank" style="color:var(--accent)">구글 파이낸스 ↗</a>` : ''}</div>`;
     return;
   }
 
