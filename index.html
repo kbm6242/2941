@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>산이네 자산관리 v102</title>
+<title>산이네 자산관리 v107</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=DM+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -729,6 +729,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
 //  CONFIG
 // ══════════════════════════════════════════
 const PUB_ID   = '2PACX-1vTtnHmESPu8TbSyMeb36AzGDr8HpdJ2CPlOTPeWYhCtHAK6jQ54ed9LN1cBr8cFL5TSDbOYcXxMwScg';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx2774hAFzUx_SYSU81M8CliETDE592WEJ3l_PuKAWNpulTg7e8J_m3jsDxqyMg7seojQ/exec'; // Apps Script Web App (주요지수 실시간)
 const GID_FAM  = '397153450';   // 우리가족계좌정리
 const GID_2025 = '1399679566';  // 2025탭 (월별)
 const GID_2026 = '402703868';   // 2026탭
@@ -971,7 +972,7 @@ async function loadAllSheetData(){
     fetchPub(GID_2026,'J8:J56'),  // [28] J열 전체 (연배당금액)
     fetchPub(GID_LOG,'A2:F500'),    // [29] 일별자산기록 전체
     fetchPub(GID_FAM,'C54'),           // [30] 총 매입원금
-    fetchPub(GID_LOG,'L2:M10'),        // [31] 주요지수 가격/등락률 (L10=KRX금)
+    fetchPub(GID_LOG,'L2:M10'),        // [31] 주요지수 fallback용 (실시간은 SCRIPT_URL)
     fetchPub(GID_FAM,'C8:I20'),        // [32] 내계좌 종목
     fetchPub(GID_FAM,'C22:I26'),       // [33] 증여예정 종목
     fetchPub(GID_FAM,'C28:I32'),       // [34] 연금계좌 종목
@@ -1102,20 +1103,33 @@ async function loadAllSheetData(){
     if(SD.dailyLog.length>0)ok++;
   }
 
-  // ── [31] 주요지수 (L2:M7, 6행×2열: 가격/등락률)
-  if(results[31]&&results[31].status==='fulfilled'){
-    try{
-      const toNum=v=>{const n=parseFloat(String(v).replace(/[^0-9.-]/g,''));return isNaN(n)?null:n;};
-      const rows=parseCSV(results[31].value);
+  // ── [31] 주요지수 - Apps Script Web App 실시간 fetch (pubURL 5분 캐시 우회)
+  try {
+    const rtRes = await fetch(`${SCRIPT_URL}?action=indices&t=${Date.now()}`);
+    const rtJson = await rtRes.json();
+    if(rtJson.ok && rtJson.data){
       const mktData=[];
-      IDX_LIST.forEach((ix,i)=>{
-        const rowI = (ix.rowIdx !== undefined) ? ix.rowIdx : i;
-        const r=rows[rowI]||[];
-        const price=toNum(r[0]),pct=toNum(r[1]);
-        if(price!==null) mktData.push({id:ix.id,price,pct:pct||0});
+      IDX_LIST.forEach(ix=>{
+        const d=rtJson.data[ix.id];
+        if(d && d.price!==null) mktData.push({id:ix.id,price:d.price,pct:d.pct||0});
       });
-      if(mktData.length>0){SD.marketIndex=mktData;ok++;}
-    }catch(e){dbg('mkt','❌ '+e.message,'err');}
+      if(mktData.length>0){SD.marketIndex=mktData;ok++;dbg('[31]idx-rt','✅ 실시간 '+mktData.length+'종목','ok');}
+    }
+  } catch(e) {
+    // 실시간 실패 시 pubURL fallback
+    if(results[31]&&results[31].status==='fulfilled'){
+      try{
+        const toNum=v=>{const n=parseFloat(String(v).replace(/[^0-9.-]/g,''));return isNaN(n)?null:n;};
+        const rows=parseCSV(results[31].value);
+        const mktData=[];
+        IDX_LIST.forEach((ix)=>{
+          const r=rows[ix.rowIdx]||[];
+          const price=toNum(r[0]),pct=toNum(r[1]);
+          if(price!==null) mktData.push({id:ix.id,price,pct:pct||0});
+        });
+        if(mktData.length>0){SD.marketIndex=mktData;ok++;dbg('[31]idx-fallback','⚠️ pubURL fallback','ok');}
+      }catch(e2){dbg('mkt','❌ '+e2.message,'err');}
+    }
   }
 
 
@@ -1123,14 +1137,17 @@ async function loadAllSheetData(){
   const parseDivItems = (deRes, lwResList, jArr, jOffsets) => {
     if(!deRes||deRes.status!=='fulfilled') return [];
     const deRows = parseCSV(deRes.value);
-    return deRows.map((row, i) => {
+    // ✅ validIdx: skipWords/빈행 제외 후 실제 배당종목 순서만 카운팅 → lwResList/jOffsets 인덱스 어긋남 방지
+    let validIdx = 0;
+    return deRows.map((row) => {
       const name = (row[0]||'').trim().replace(/\s*\(.*?\)\s*$/, '').trim(); //(주배당), (월배당) 등 괄호 내용 자동 제거
       const qty  = parseInt((row[1]||'0').replace(/[^0-9]/g,''))||0;
-      if(!name) return null;
-      // 매매/합계 등 소계행 제외 (종목명 키워드 또는 수량 0 제외)
+      if(!name) return null; // 빈행 → validIdx 증가 안함
+      // 매매/합계 등 소계행 제외 → validIdx 증가 안함
       const skipWords = ['매매','합계','소계','합산','계','total','sum'];
       if(skipWords.some(w=>name.toLowerCase()===w.toLowerCase())) return null;
-      if(qty===0) return null;
+      // ✅ 이 시점에서 실제 종목 → validIdx 사용 후 증가
+      const i = validIdx++;
       // 월별 배당 (L~W = 12개월)
       const lwRes = lwResList[i];
       let mArr = Array(12).fill(null);
@@ -1151,6 +1168,9 @@ async function loadAllSheetData(){
           if(!isNaN(jn)&&jn>0) annual='₩'+Math.round(jn).toLocaleString('ko-KR');
         }
       }
+      // ✅ 수량 0 + 배당 기록도 없으면 제외, 배당 기록 있으면 유지
+      const hasDivData = mArr.some(v=>v!==null) || annual!=='—';
+      if(qty===0 && !hasDivData) return null;
       return {name, qty, annual, m:mArr};
     }).filter(Boolean);
   };
@@ -1405,9 +1425,9 @@ function renderMarketIndex() {
     return;
   }
 
-  // IDX_LIST 순서 = J2:K7 순서 (다우/S&P/나스닥/러셀/코스피/코스닥)
-  IDX_LIST.forEach((ix, i) => {
-    const d = data[i];
+  // IDX_LIST 순서로 id 매칭하여 렌더링
+  IDX_LIST.forEach((ix) => {
+    const d = data.find(x => x.id === ix.id);
     if(!d || d.price === null) { renderIdxCard(ix, null); return; }
 
     const price = d.price;
@@ -1422,7 +1442,7 @@ function renderMarketIndex() {
     if(!el) return;
     el.className = 'idx-card ' + dir;
     el.innerHTML = `
-      <div class="idx-name">${ix.name}${ix.gf ? ` <a href="https://www.google.com/finance/quote/${ix.gf}" target="_blank" style="font-size:11px;color:var(--accent);text-decoration:none;">구글 파이낸스 ↗</a>` : ''}</div>
+      <div class="idx-name">${ix.name} <a href="https://www.google.com/finance/quote/${ix.gf}" target="_blank" style="font-size:11px;color:var(--accent);text-decoration:none;">구글 파이낸스 ↗</a></div>
       <div class="idx-price">${fmtP(price)}</div>
       <div class="idx-change-row">
         <span class="idx-pct ${dir}">${arrow} ${pctStr}</span>
@@ -2124,6 +2144,12 @@ function renderHoldingsDiv(){
     tbody.appendChild(hRow);
     sec.items.forEach(item=>{
       const tr=document.createElement('tr');
+      // ✅ 수량 0 종목: 흐리게 표시 + '정리됨' 배지
+      const isZeroQty = item.qty===0;
+      if(isZeroQty) tr.style.opacity='0.45';
+      const nameHtml = isZeroQty
+        ? `${item.name} <span style="font-size:10px;background:#4a6480;color:#94afc8;padding:1px 6px;border-radius:3px;font-weight:700;vertical-align:middle;">정리됨</span>`
+        : item.name;
       // m 배열을 12개로 맞추고 null은 '—' 표시
       const mArr=Array.from({length:12},(_,i)=>{
         const v=(item.m&&item.m[i]!=null)?item.m[i]:null;
@@ -2131,7 +2157,8 @@ function renderHoldingsDiv(){
         if(v==='—') return '<td class="td-month" style="color:var(--text-muted)">—</td>';
         return `<td class="td-month">${v}</td>`;
       });
-      tr.innerHTML=`<td class="td-name">  ${item.name}</td><td class="td-qty">${item.qty}</td><td class="td-div">${item.annual||'—'}</td>${mArr.join('')}`;
+      const qtyDisplay = isZeroQty ? `<span style="color:var(--text-muted);">0</span>` : item.qty;
+      tr.innerHTML=`<td class="td-name">${nameHtml}</td><td class="td-qty">${qtyDisplay}</td><td class="td-div">${item.annual||'—'}</td>${mArr.join('')}`;
       tbody.appendChild(tr);
     });
   });
@@ -2242,13 +2269,13 @@ function updateHmDateLabels(){
 
 // ══ 주요 지수 ══
 const IDX_LIST = [
-  {id:'dji',  name:'다우존스',   sym:'^DJI',  group:'us', gf:'.DJI:INDEXDJX'},
-  {id:'spx',  name:'S&P 500',    sym:'^GSPC', group:'us', gf:'.INX:INDEXSP'},
-  {id:'ndq',  name:'나스닥 종합', sym:'^IXIC', group:'us', gf:'.IXIC:INDEXNASDAQ'},
-  {id:'rut',  name:'러셀 2000',  sym:'^RUT',  group:'us', gf:'RUT:INDEXRUSSELL'},
-  {id:'ks11', name:'코스피',      sym:'^KS11', group:'kr', gf:'KOSPI:KRX'},
-  {id:'kq11', name:'코스닥',      sym:'^KQ11', group:'kr', gf:'KOSDAQ:KOSDAQ'},
-  {id:'krxgold', name:'KRX금',    sym:'KRXGOLD', group:'kr', gf:null, rowIdx:8},
+  {id:'dji',     name:'다우존스',   sym:'^DJI',  group:'us', gf:'.DJI:INDEXDJX',    rowIdx:0},
+  {id:'spx',     name:'S&P 500',    sym:'^GSPC', group:'us', gf:'.INX:INDEXSP',      rowIdx:1},
+  {id:'ndq',     name:'나스닥 종합', sym:'^IXIC', group:'us', gf:'.IXIC:INDEXNASDAQ', rowIdx:2},
+  {id:'rut',     name:'러셀 2000',  sym:'^RUT',  group:'us', gf:'RUT:INDEXRUSSELL',  rowIdx:3},
+  {id:'ks11',    name:'코스피',      sym:'^KS11', group:'kr', gf:'KOSPI:KRX',         rowIdx:4},
+  {id:'kq11',    name:'코스닥',      sym:'^KQ11', group:'kr', gf:'KOSDAQ:KOSDAQ',     rowIdx:5},
+  {id:'krxgold', name:'KRX금',      sym:'',      group:'kr', gf:'',                  rowIdx:8}, // L10=9번째행(index 8)
 ];
 let idxLastLoad = 0;
 
@@ -2411,7 +2438,7 @@ function renderIdxCard(ix, q){
     el.innerHTML=`
       <div class="idx-name">${ix.name}</div>
       <div class="idx-price">—</div>
-      <div class="idx-time">데이터 없음${ix.gf ? ` · <a href="https://www.google.com/finance/quote/${ix.gf}" target="_blank" style="color:var(--accent)">구글 파이낸스 ↗</a>` : ''}</div>`;
+      <div class="idx-time">데이터 없음 · <a href="https://www.google.com/finance/quote/${ix.gf}" target="_blank" style="color:var(--accent)">구글 파이낸스 ↗</a></div>`;
     return;
   }
 
