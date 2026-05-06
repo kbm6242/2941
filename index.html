@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>산이네 자산관리 v108</title>
+<title>산이네 자산관리 v111</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=DM+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -737,7 +737,7 @@ const GID_LOG  = '231310426';   // 일별자산기록 (Apps Script 자동저장)
 const GID_MARKET_NEWS = '1766819149'; // MarketNews 시트 (GID 확인 후 교체)
 
 // ★ 연도별 X축 라벨 (13개: 전년 12월 ~ 당해 12월)
-const LABELS_2025 = ['25.12','25.1','25.2','25.3','25.4','25.5','25.6','25.7','25.8','25.9','25.10','25.11','25.12'];
+const LABELS_2025 = ['24.12','25.1','25.2','25.3','25.4','25.5','25.6','25.7','25.8','25.9','25.10','25.11','25.12']; // [0]=2024년12월말(기준점)
 const LABELS_2026 = ['25.12','26.1','26.2','26.3','26.4','26.5','26.6','26.7','26.8','26.9','26.10','26.11','26.12'];
 
 function pubUrl(gid,range){return`https://docs.google.com/spreadsheets/d/e/${PUB_ID}/pub?output=csv&gid=${gid}&range=${encodeURIComponent(range)}&t=${Date.now()}`;}
@@ -944,9 +944,9 @@ async function loadAllSheetData(){
     // F2:J4 추가정보
     fetchPub(GID_FAM,'F2:J4'),// [4]
     // ★ 2025 월별 (GID_2025)
-    fetchPub(GID_2025,'O82:O94'),   // [5] 내계좌 2025 (11값 → pad 13)
-    fetchPub(GID_2025,'O101:O113'), // [6] 보연씌 2025 (13값)
-    fetchPub(GID_2025,'W82:W94'),   // [7] 산이 2025 (13값)
+    fetchPub(GID_2025,'O83:O94'),   // [5] 내계좌 2025 (25.1~25.12, 12값)
+    fetchPub(GID_2025,'O109:O113'), // [6] 보연씌 2025 (8~12월, 5값)
+    fetchPub(GID_2025,'W83:W94'),   // [7] 산이 2025 (25.1~25.12, 12값)
     // ★ 2026 월별 (GID_FAM)
     fetchPub(GID_FAM,'O9:O21'),  // [8] 내계좌 2026 (13값)
     fetchPub(GID_FAM,'O25:O37'),  // [9] 보연씌 2026 (13값)
@@ -1017,9 +1017,17 @@ async function loadAllSheetData(){
 
   // 2025 월별 — 내계좌 11값을 13으로 패딩
   const nae2025Raw=pCol(results[5]);
-  SD.mon2025.nae=padArr(nae2025Raw,13);
-  SD.mon2025.boy=padArr(pCol(results[6]),13);
-  SD.mon2025.san=padArr(pCol(results[7]),13);
+  // 내계좌 2025: O83:O94 (1~12월, 12개) → [0]=null(24.12없음), [1]~[12]=1~12월
+  const nae2025Padded=[null,...padArr(nae2025Raw,12)];  // 앞에 null 1개 추가
+  SD.mon2025.nae=nae2025Padded;
+  // 보연씌 2025: O109:O113 (8~12월, 5개) → 13개 배열에서 [8]~[12] 위치로 패딩
+  const boy2025Raw=pCol(results[6]);  // 5개 (8~12월)
+  const boy2025Padded=Array(13).fill(null);
+  [8,9,10,11,12].forEach((idx,i)=>{ if(boy2025Raw[i]!=null) boy2025Padded[idx]=boy2025Raw[i]; });
+  SD.mon2025.boy=boy2025Padded;
+  // 산이 2025: W83:W94 (1~12월, 12개) → [0]=null(24.12없음), [1]~[12]=1~12월
+  const san2025Raw=pCol(results[7]);
+  SD.mon2025.san=[null,...padArr(san2025Raw,12)];
 
   // 2026 월별
   SD.mon2026.nae=padArr(pCol(results[8]),13);
@@ -1330,20 +1338,30 @@ function updateCards(){
     const prev=entries.filter(e=>e.date<today).slice(-1)[0]||null;
     if(prev){sanP=prev.san;naeP=prev.nae;boyP=prev.boy;}
   }else if(currentPeriod==='monthly'){
-    const mIdx=new Date().getMonth();
+    // ✅ KST 기준 현재 월로 전월 말 인덱스 계산
+    // mon 배열: [0]=전년12월말, [1]=1월말, [2]=2월말 ...
+    // 현재 5월(getMonth=4) → 전월말=4월 → mon[4] ✅
+    const mIdx=getKST().getMonth(); // KST 기준 월(0-indexed)
     sanP=mon.san?.[mIdx]??null;
     naeP=mon.nae?.[mIdx]??null;
     boyP=mon.boy?.[mIdx]??null;
   }else{
-    sanP=mon.san?.[0]??null;
-    naeP=mon.nae?.[0]??null;
-    boyP=mon.boy?.[0]??null;
+    // ✅ 연도별: 전년(2025) 12월 말 기준 = SD.mon2025의 마지막([12]=25년12월말)
+    // GID_FAM O9:O21의 [0]은 25.12말이 아닌 다른 값이므로 mon2025 마지막값 사용
+    const prevMon = SD.mon2025 || {};
+    sanP = prevMon.san?.[12] ?? null;
+    naeP = prevMon.nae?.[12] ?? null;
+    boyP = prevMon.boy?.[12] ?? null;
   }
 
   if(SD.san!=null&&sanP!=null)setChg('san-change',fmtChg(SD.san,sanP));
   if(SD.nae!=null&&naeP!=null)setChg('nae-change',fmtChg(SD.nae,naeP));
   if(SD.boy!=null&&boyP!=null)setChg('boy-change',fmtChg(SD.boy,boyP));
-  const totalP=(sanP||0)+(naeP||0)+(boyP||0);
+  // ✅ totalP: null인 계좌는 현재값으로 대체 (분모 왜곡 방지)
+  // null이면 해당 계좌는 변동 없음(현재값=이전값)으로 가정하여 합산
+  const totalP = (sanP!=null?sanP:(SD.san||0))
+               + (naeP!=null?naeP:(SD.nae||0))
+               + (boyP!=null?boyP:(SD.boy||0));
   if(SD.total!=null&&totalP>0)setChg('total-change',fmtChg(SD.total,totalP));
 }
 
@@ -1582,12 +1600,12 @@ function getMonthlyData(){
     2025:{
       san:[160532396,121680551,118269280,110579215,108155227,128282723,147221025,170316946,166441396,179848535,200076504,180022729,160532396],
       nae:[36736016,29024978,27393354,26687418,30315827,31474430,32917473,33605166,34800815,39089241,40393631,39395556,36736016],
-      boy:[12344747,null,null,null,null,null,null,null,null,null,null,null,null],
+      boy:[null,null,null,null,null,null,null,null,10365084,12762781,13200523,12944410,12344747], // 8~12월말
     },
     2026:{
       san:[160532396,null,null,null,null,null,null,null,null,null,null,null,null],
       nae:[36736016,null,null,null,null,null,null,null,null,null,null,null,null],
-      boy:[12344747,null,null,null,null,null,null,null,null,null,null,null,null],
+      boy:[null,null,null,null,null,null,null,null,10365084,12762781,13200523,12944410,12344747], // 8~12월말
     }
   };
   return{
@@ -1612,7 +1630,7 @@ function renderTrend(){
     const mon2025fb={
       san:[160532396,121680551,118269280,110579215,108155227,128282723,147221025,170316946,166441396,179848535,200076504,180022729,160532396],
       nae:[36736016,29024978,27393354,26687418,30315827,31474430,32917473,33605166,34800815,39089241,40393631,39395556,36736016],
-      boy:[12344747,null,null,null,null,null,null,null,null,null,null,null,null],
+      boy:[null,null,null,null,null,null,null,null,10365084,12762781,13200523,12944410,12344747], // 8~12월말
     };
     // 2026년 1~3월 월말 → SD.mon2026에 값 있으면 사용, 없으면 직접 하드코딩
     const mon2026={
@@ -1626,8 +1644,12 @@ function renderTrend(){
       const monthDates=['2025-01-31','2025-02-28','2025-03-31','2025-04-30',
                         '2025-05-31','2025-06-30','2025-07-31','2025-08-31',
                         '2025-09-30','2025-10-31','2025-11-30','2025-12-31'];
+      // ✅ SD.mon2025 우선 사용 (보연씌 8~12월 실데이터 포함), 없으면 하드코딩
+      const boyData = SD.mon2025&&SD.mon2025.boy ? SD.mon2025.boy : mon2025fb.boy;
+      const naeData = SD.mon2025&&SD.mon2025.nae ? SD.mon2025.nae : mon2025fb.nae;
+      const sanData = SD.mon2025&&SD.mon2025.san ? SD.mon2025.san : mon2025fb.san;
       return monthDates.map((d,i)=>({
-        date:d, san:mon2025fb.san[i+1], nae:mon2025fb.nae[i+1], boy:mon2025fb.boy[i+1], isHard:true
+        date:d, san:sanData[i+1], nae:naeData[i+1], boy:boyData[i+1], isHard:true
       })).filter(e=>e.san||e.nae||e.boy);
     }else{
       // 2026년 1~3월 월말
