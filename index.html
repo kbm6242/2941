@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>산이네 자산관리 v111</title>
+<title>산이네 자산관리 v112</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=DM+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -476,6 +476,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
       <div class="hm-tab" id="htab-nasdaq" onclick="switchHeatmap('nasdaq')">🖥 Nasdaq 100</div>
       <div class="hm-tab" id="htab-russell" onclick="switchHeatmap('russell')">📊 Russell 2000</div>
       <div class="hm-tab" id="htab-kospi" onclick="switchHeatmap('kospi')">코스피</div>
+      <div class="hm-tab" id="htab-kosdaq" onclick="switchHeatmap('kosdaq')">코스닥</div>
     </div>
     <!-- S&P 500 -->
     <div class="hm-frame-wrap" id="hm-sp500">
@@ -523,6 +524,18 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
       <div class="hm-img-wrap" id="hm-img-kospi">
         <img id="hm-img-kospi-img" data-src="./images/heatmap_kospi.png" alt="코스피 히트맵"
           onerror="this.parentNode.innerHTML='<div class='hm-no-img'>📷 이미지 없음<br><span>GitHub Actions가 매일 KST 16:00에 자동 캡처합니다</span><br><a href='https://markets.hankyung.com/heatmap/kospi' target='_blank' class='hm-open-btn' style='margin-top:12px;'>📊 한경에서 보기</a></div>'">
+      </div>
+    </div>
+    <!-- 코스닥 -->
+    <div class="hm-frame-wrap" id="hm-kosdaq" style="display:none;">
+      <div class="hm-img-header">
+        <span class="hm-update-badge">🕓 매일 KST 16:00 자동 업데이트</span>
+        <span class="hm-date-badge" id="hm-date-kosdaq">—</span>
+        <a class="hm-open-btn" href="https://markets.hankyung.com/heatmap/kosdaq" target="_blank">🔗 한경 실시간 보기</a>
+      </div>
+      <div class="hm-img-wrap" id="hm-img-kosdaq">
+        <img id="hm-img-kosdaq-img" data-src="./images/heatmap_kosdaq.png" alt="코스닥 히트맵"
+          onerror="this.parentNode.innerHTML='<div class=\'hm-no-img\'>📷 이미지 없음<br><span>GitHub Actions가 매일 KST 16:00에 자동 캡처합니다</span><br><a href=\'https://markets.hankyung.com/heatmap/kosdaq\' target=\'_blank\' class=\'hm-open-btn\' style=\'margin-top:12px;\'>📊 한경에서 보기</a></div>'">
       </div>
     </div>
   </div>
@@ -2296,13 +2309,15 @@ function updateHmDateLabels(){
   });
   const ko=document.getElementById('hm-date-kospi');
   if(ko) ko.textContent = koLabel;
+  const kodaq=document.getElementById('hm-date-kosdaq');
+  if(kodaq) kodaq.textContent = koLabel;
 }
 
 // ══ 주요 지수 ══
 const IDX_LIST = [
-  {id:'dji',     name:'다우존스',   sym:'^DJI',  group:'us', gf:'.DJI:INDEXDJX',    rowIdx:0},
-  {id:'spx',     name:'S&P 500',    sym:'^GSPC', group:'us', gf:'.INX:INDEXSP',      rowIdx:1},
-  {id:'ndq',     name:'나스닥 종합', sym:'^IXIC', group:'us', gf:'.IXIC:INDEXNASDAQ', rowIdx:2},
+  {id:'dji',     name:'S&P 500',   sym:'^DJI',  group:'us', gf:'.DJI:INDEXDJX',    rowIdx:0},
+  {id:'spx',     name:'나스닥 종합',    sym:'^GSPC', group:'us', gf:'.INX:INDEXSP',      rowIdx:1},
+  {id:'ndq',     name:'다우존스', sym:'^IXIC', group:'us', gf:'.IXIC:INDEXNASDAQ', rowIdx:2},
   {id:'rut',     name:'러셀 2000',  sym:'^RUT',  group:'us', gf:'RUT:INDEXRUSSELL',  rowIdx:3},
   {id:'ks11',    name:'코스피',      sym:'^KS11', group:'kr', gf:'KOSPI:KRX',         rowIdx:4},
   {id:'kq11',    name:'코스닥',      sym:'^KQ11', group:'kr', gf:'KOSDAQ:KOSDAQ',     rowIdx:5},
@@ -2513,13 +2528,13 @@ function getHmCacheKey(){
 }
 function applyHmCacheBuster(){
   const v=getHmCacheKey();
-  ['sp500','nasdaq','kospi','russell'].forEach(function(t){
+  ['sp500','nasdaq','kospi','kosdaq','russell'].forEach(function(t){
     const img=document.getElementById('hm-img-'+t+'-img');
     if(img&&img.dataset.src) img.src=img.dataset.src+'?v='+v;
   });
   updateHmDateLabels();
 }
-function switchHeatmap(type){activeHm=type;['sp500','nasdaq','kospi','russell'].forEach(t=>{const w=document.getElementById('hm-'+t);if(w)w.style.display=t===type?'block':'none';document.getElementById('htab-'+t)?.classList.toggle('active',t===type);});initHeatmap(type);applyHmCacheBuster();}
+function switchHeatmap(type){activeHm=type;['sp500','nasdaq','kospi','kosdaq','russell'].forEach(t=>{const w=document.getElementById('hm-'+t);if(w)w.style.display=t===type?'block':'none';document.getElementById('htab-'+t)?.classList.toggle('active',t===type);});initHeatmap(type);applyHmCacheBuster();}
 function initHeatmap(type){if(hmInit[type])return;hmInit[type]=true;const iframe=document.getElementById('iframe-'+type);if(iframe){iframe.src=HM_URLS[type];setTimeout(()=>hmCheck(type),5000);}}
 function hmLoaded(type){try{document.getElementById('iframe-'+type)?.contentDocument;document.getElementById('hm-'+type+'-loading').style.display='none';}catch(e){if(e.name==='SecurityError')document.getElementById('hm-'+type+'-loading').style.display='none';else hmError(type);}}
 function hmError(type){document.getElementById('hm-'+type+'-loading').style.display='none';const iframe=document.getElementById('iframe-'+type);if(iframe)iframe.style.display='none';document.getElementById('hm-'+type+'-blocked')?.classList.add('show');}
