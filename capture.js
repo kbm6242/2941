@@ -47,21 +47,21 @@ const CAPTURES = [
     name: '코스피',
     url: 'https://markets.hankyung.com/marketmap/kospi',
     isImage: false,
-    waitMs: 9000,
+    waitMs: 12000,
     selector: '.heatmap-wrap',
-    topOffset: 80,   // ✅ 상단 탭 영역(변동율 1일/1주...) 제외
+    topOffset: 80,
     viewport: { width: 1300, height: 900 },
     output: 'images/heatmap_kospi.png',
     runAt: 'KR',
   },
   {
     id: 'kosdaq',
-    name: '코스닥',                                        // ✅ 코스닥 추가
+    name: '코스닥',
     url: 'https://markets.hankyung.com/marketmap/kosdaq',
     isImage: false,
     waitMs: 9000,
     selector: '.heatmap-wrap',
-    topOffset: 80,   // ✅ 코스피와 동일하게 탭 영역 제외
+    topOffset: 80,
     viewport: { width: 1300, height: 900 },
     output: 'images/heatmap_kosdaq.png',
     runAt: 'KR',
@@ -90,10 +90,9 @@ async function captureTarget(config, browser) {
 
     await page.waitForTimeout(config.waitMs);
 
-    // 코스피/코스닥: 상단 스크롤
     if (config.id === 'kospi' || config.id === 'kosdaq') {
-      await page.evaluate(() => window.scrollTo(0, 200));
-      await page.waitForTimeout(500);
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.waitForTimeout(300);
     }
 
     await page.addStyleTag({
@@ -109,6 +108,8 @@ async function captureTarget(config, browser) {
       `
     });
 
+    await page.waitForTimeout(800);
+
     let element = null;
     if (config.selector) {
       try {
@@ -121,7 +122,7 @@ async function captureTarget(config, browser) {
 
     if (element) {
       const box = await element.boundingBox();
-      const offset = config.topOffset || 0;  // ✅ topOffset 적용
+      const offset = config.topOffset || 0;
       console.log(`   📐 요소 크기: ${Math.round(box.width)}×${Math.round(box.height)} (topOffset: ${offset}px)`);
 
       await page.screenshot({
@@ -129,9 +130,9 @@ async function captureTarget(config, browser) {
         type: 'png',
         clip: {
           x: box.x,
-          y: box.y + offset,          // ✅ 탭 영역만큼 아래에서 시작
+          y: box.y + offset,
           width: box.width,
-          height: box.height - offset, // ✅ 잘라낸 만큼 높이 보정
+          height: box.height - offset,
         },
       });
     } else if (config.clip) {
