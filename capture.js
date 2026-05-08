@@ -10,9 +10,7 @@ const CAPTURES = [
     id: 'sp500',
     name: 'S&P 500',
     url: 'https://finviz.com/map.ashx?t=sec&mn=snp500',
-    isImage: false,
     waitMs: 8000,
-    selector: null,
     clip: { x: 400, y: 60, width: 1210, height: 730 },
     viewport: { width: 1800, height: 900 },
     output: 'images/heatmap_sp500.png',
@@ -22,9 +20,7 @@ const CAPTURES = [
     id: 'nasdaq',
     name: 'Nasdaq 100',
     url: 'https://finviz.com/map.ashx?t=sec_ndx',
-    isImage: false,
     waitMs: 8000,
-    selector: null,
     clip: { x: 400, y: 60, width: 1210, height: 730 },
     viewport: { width: 1800, height: 900 },
     output: 'images/heatmap_nasdaq.png',
@@ -34,9 +30,7 @@ const CAPTURES = [
     id: 'russell',
     name: 'Russell 2000',
     url: 'https://finviz.com/map.ashx?t=sec_rut',
-    isImage: false,
     waitMs: 8000,
-    selector: null,
     clip: { x: 400, y: 60, width: 1210, height: 730 },
     viewport: { width: 1800, height: 900 },
     output: 'images/heatmap_russell.png',
@@ -46,10 +40,8 @@ const CAPTURES = [
     id: 'kospi',
     name: '코스피',
     url: 'https://markets.hankyung.com/marketmap/kospi',
-    isImage: false,
     waitMs: 12000,
-    selector: '.heatmap-wrap',
-    topOffset: 80,
+    clip: { x: 0, y: 95, width: 1300, height: 805 },
     viewport: { width: 1300, height: 900 },
     output: 'images/heatmap_kospi.png',
     runAt: 'KR',
@@ -58,10 +50,8 @@ const CAPTURES = [
     id: 'kosdaq',
     name: '코스닥',
     url: 'https://markets.hankyung.com/marketmap/kosdaq',
-    isImage: false,
     waitMs: 9000,
-    selector: '.heatmap-wrap',
-    topOffset: 80,
+    clip: { x: 0, y: 95, width: 1300, height: 805 },
     viewport: { width: 1300, height: 900 },
     output: 'images/heatmap_kosdaq.png',
     runAt: 'KR',
@@ -69,7 +59,7 @@ const CAPTURES = [
 ];
 
 async function captureTarget(config, browser) {
-  console.log(`\n📸 [${config.name}] 캡처 시작...`);
+  console.log(`\\n📸 [${config.name}] 캡처 시작...`);
   console.log(`   URL: ${config.url}`);
 
   const context = await browser.newContext({
@@ -90,64 +80,11 @@ async function captureTarget(config, browser) {
 
     await page.waitForTimeout(config.waitMs);
 
-    if (config.id === 'kospi' || config.id === 'kosdaq') {
-      await page.evaluate(() => window.scrollTo(0, 0));
-      await page.waitForTimeout(300);
-    }
-
-    await page.addStyleTag({
-      content: `
-        ::-webkit-scrollbar { display: none !important; }
-        * { scrollbar-width: none !important; }
-        .header, header, nav, footer, .ad,
-        [class*="banner"], [class*="popup"], [id*="popup"],
-        [class*="dismiss"], [class*="Dismiss"],
-        [class*="modal"], [class*="toast"],
-        [class*="gnb"], [class*="lnb"],
-        .header-wrap, #header { display: none !important; }
-      `
+    await page.screenshot({
+      path: config.output,
+      type: 'png',
+      clip: config.clip,
     });
-
-    await page.waitForTimeout(800);
-
-    let element = null;
-    if (config.selector) {
-      try {
-        element = await page.waitForSelector(config.selector, { timeout: 20000 });
-        console.log(`   ✅ 선택자 발견: ${config.selector}`);
-      } catch {
-        console.log(`   ⚠️  선택자 없음 → 전체 화면 캡처`);
-      }
-    }
-
-    if (element) {
-      const box = await element.boundingBox();
-      const offset = config.topOffset || 0;
-      console.log(`   📐 요소 크기: ${Math.round(box.width)}×${Math.round(box.height)} (topOffset: ${offset}px)`);
-
-      await page.screenshot({
-        path: config.output,
-        type: 'png',
-        clip: {
-          x: box.x,
-          y: box.y + offset,
-          width: box.width,
-          height: box.height - offset,
-        },
-      });
-    } else if (config.clip) {
-      await page.screenshot({
-        path: config.output,
-        type: 'png',
-        clip: config.clip,
-      });
-    } else {
-      await page.screenshot({
-        path: config.output,
-        type: 'png',
-        fullPage: false,
-      });
-    }
 
     const stats = fs.statSync(config.output);
     console.log(`   ✅ 저장: ${config.output} (${(stats.size / 1024).toFixed(1)} KB)`);
@@ -192,6 +129,6 @@ async function captureTarget(config, browser) {
   }
 
   await browser.close();
-  console.log(`\n🏁 완료: ${successCount}/${targets.length} 성공`);
+  console.log(`\\n🏁 완료: ${successCount}/${targets.length} 성공`);
   process.exit(successCount > 0 ? 0 : 1);
 })();
