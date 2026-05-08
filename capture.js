@@ -6,51 +6,64 @@ const isUSTime = (hour === 'US' || hour === 'all');
 const isKRTime = (hour === 'KR' || hour === 'all');
 
 const CAPTURES = [
-{
-  id: 'sp500',
-  name: 'S&P 500',
-  url: 'https://finviz.com/map.ashx?t=sec&mn=snp500',
-  isImage: false,
-  waitMs: 8000,
-  selector: null,
-  clip: { x: 400, y: 60, width: 1210, height: 730 },
-  viewport: { width: 1800, height: 900 },
-  output: 'images/heatmap_sp500.png',
-  runAt: 'US',
-},
-{
-  id: 'nasdaq',
-  name: 'Nasdaq 100',
-  url: 'https://finviz.com/map.ashx?t=sec_ndx',
-  isImage: false,
-  waitMs: 8000,
-  selector: null,
-  clip: { x: 400, y: 60, width: 1210, height: 730 },
-  viewport: { width: 1800, height: 900 },
-  output: 'images/heatmap_nasdaq.png',
-  runAt: 'US',
-},
   {
-  id: 'russell',
-  name: 'Russell 2000',
-  url: 'https://finviz.com/map.ashx?t=sec_rut',
-  isImage: false,
-  waitMs: 8000,
-  selector: null,
-  clip: { x: 400, y: 60, width: 1210, height: 730 },  // S&P 500과 동일
-  viewport: { width: 1800, height: 900 },
-  output: 'images/heatmap_russell.png',
-  runAt: 'US',  // KST 07:00에 S&P, Nasdaq과 함께 캡처
-},
+    id: 'sp500',
+    name: 'S&P 500',
+    url: 'https://finviz.com/map.ashx?t=sec&mn=snp500',
+    isImage: false,
+    waitMs: 8000,
+    selector: null,
+    clip: { x: 400, y: 60, width: 1210, height: 730 },
+    viewport: { width: 1800, height: 900 },
+    output: 'images/heatmap_sp500.png',
+    runAt: 'US',
+  },
+  {
+    id: 'nasdaq',
+    name: 'Nasdaq 100',
+    url: 'https://finviz.com/map.ashx?t=sec_ndx',
+    isImage: false,
+    waitMs: 8000,
+    selector: null,
+    clip: { x: 400, y: 60, width: 1210, height: 730 },
+    viewport: { width: 1800, height: 900 },
+    output: 'images/heatmap_nasdaq.png',
+    runAt: 'US',
+  },
+  {
+    id: 'russell',
+    name: 'Russell 2000',
+    url: 'https://finviz.com/map.ashx?t=sec_rut',
+    isImage: false,
+    waitMs: 8000,
+    selector: null,
+    clip: { x: 400, y: 60, width: 1210, height: 730 },
+    viewport: { width: 1800, height: 900 },
+    output: 'images/heatmap_russell.png',
+    runAt: 'US',
+  },
   {
     id: 'kospi',
     name: '코스피',
     url: 'https://markets.hankyung.com/marketmap/kospi',
     isImage: false,
     waitMs: 9000,
-    selector: '.heatmap-wrap',  // 또는 실제 히트맵 컨테이너 클래스
+    selector: '.heatmap-wrap',
+    topOffset: 80,   // ✅ 상단 탭 영역(변동율 1일/1주...) 제외
     viewport: { width: 1300, height: 900 },
     output: 'images/heatmap_kospi.png',
+    runAt: 'KR',
+  },
+  {
+    id: 'kosdaq',
+    name: '코스닥',                                        // ✅ 코스닥 추가
+    url: 'https://markets.hankyung.com/marketmap/kosdaq',
+    isImage: false,
+    waitMs: 9000,
+    selector: '.heatmap-wrap',
+    topOffset: 80,   // ✅ 코스피와 동일하게 탭 영역 제외
+    viewport: { width: 1300, height: 900 },
+    output: 'images/heatmap_kosdaq.png',
     runAt: 'KR',
   },
 ];
@@ -59,7 +72,6 @@ async function captureTarget(config, browser) {
   console.log(`\n📸 [${config.name}] 캡처 시작...`);
   console.log(`   URL: ${config.url}`);
 
-  // 각 캡처마다 뷰포트 크기를 개별 설정
   const context = await browser.newContext({
     viewport: config.viewport || { width: 1800, height: 900 },
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
@@ -72,33 +84,29 @@ async function captureTarget(config, browser) {
   try {
     await page.goto(config.url, { waitUntil: 'domcontentloaded', timeout: 40000 });
 
-    // 광고/팝업 닫기 시도
     try {
       await page.keyboard.press('Escape');
     } catch (_) {}
 
-    // 렌더링 대기
     await page.waitForTimeout(config.waitMs);
 
-    // 코스피 히트맵: 상단 헤더/팝업 건너뛰고 스크롤
-    if (config.id === 'kospi') {
+    // 코스피/코스닥: 상단 스크롤
+    if (config.id === 'kospi' || config.id === 'kosdaq') {
       await page.evaluate(() => window.scrollTo(0, 200));
       await page.waitForTimeout(500);
     }
 
-    // 스크롤바 숨기기 (깔끔한 캡처)
     await page.addStyleTag({
       content: `
         ::-webkit-scrollbar { display: none !important; }
         * { scrollbar-width: none !important; }
-        /* 헤더/팝업/배너 제거 */
         .header, header, nav, footer, .ad,
         [class*="banner"], [class*="popup"], [id*="popup"],
         [class*="dismiss"], [class*="Dismiss"],
         [class*="modal"], [class*="toast"],
         [class*="gnb"], [class*="lnb"],
         .header-wrap, #header { display: none !important; }
-  `
+      `
     });
 
     let element = null;
@@ -113,17 +121,17 @@ async function captureTarget(config, browser) {
 
     if (element) {
       const box = await element.boundingBox();
-      console.log(`   📐 요소 크기: ${Math.round(box.width)}×${Math.round(box.height)}`);
+      const offset = config.topOffset || 0;  // ✅ topOffset 적용
+      console.log(`   📐 요소 크기: ${Math.round(box.width)}×${Math.round(box.height)} (topOffset: ${offset}px)`);
 
-      // clip 방식으로 캡처 (canvas 요소도 정확히 캡처됨)
       await page.screenshot({
         path: config.output,
         type: 'png',
         clip: {
           x: box.x,
-          y: box.y,
+          y: box.y + offset,          // ✅ 탭 영역만큼 아래에서 시작
           width: box.width,
-          height: box.height,
+          height: box.height - offset, // ✅ 잘라낸 만큼 높이 보정
         },
       });
     } else if (config.clip) {
@@ -139,7 +147,6 @@ async function captureTarget(config, browser) {
         fullPage: false,
       });
     }
-
 
     const stats = fs.statSync(config.output);
     console.log(`   ✅ 저장: ${config.output} (${(stats.size / 1024).toFixed(1)} KB)`);
