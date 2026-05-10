@@ -51,7 +51,7 @@ const CAPTURES = [
     name: '코스닥',
     url: 'https://markets.hankyung.com/marketmap/kosdaq',
     waitMs: 8000,
-    clip: { x: 0, y: , width: 1300, height: 900 },
+    clip: { x: 0, y: 350, width: 1300, height: 900 },
     viewport: { width: 350, height: 1300 },
     output: 'images/heatmap_kosdaq.png',
     runAt: 'KR',
