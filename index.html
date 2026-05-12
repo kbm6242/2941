@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>산이네 자산관리 v112</title>
+<title>산이네 자산관리 v115</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=DM+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -205,6 +205,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .m-bar:hover{background:rgba(56,189,248,.22);}
 .m-bar.current{background:var(--accent);box-shadow:0 0 14px rgba(56,189,248,.35);}
 .m-bar.empty{background:var(--border);opacity:.3;}
+.m-bar.peak{background:linear-gradient(180deg,#f59e0b,#f97316);box-shadow:0 0 14px rgba(245,158,11,.5);}
 .m-label{font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;}
 .summary-table{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:18px;}
 .st-header,.st-row{display:grid;grid-template-columns:58px repeat(12,1fr);padding:9px 16px;font-size:11px;font-family:'DM Mono',monospace;}
@@ -987,10 +988,10 @@ async function loadAllSheetData(){
     fetchPub(GID_FAM,'C54'),           // [30] 총 매입원금
     fetchPub(GID_LOG,'L2:M10'),        // [31] 주요지수 fallback용 (실시간은 SCRIPT_URL)
     fetchPub(GID_FAM,'C8:I20'),        // [32] 내계좌 종목
-    fetchPub(GID_FAM,'C22:I28'),       // [33] 증여예정 종목
-    fetchPub(GID_FAM,'C30:I34'),       // [34] 연금계좌 종목
-    fetchPub(GID_FAM,'C37:I47'),       // [35] 보연이계좌 종목
-    fetchPub(GID_FAM,'C50:I52'),       // [36] 산이계좌 종목
+    fetchPub(GID_FAM,'C22:I26'),       // [33] 증여예정 종목
+    fetchPub(GID_FAM,'C28:I32'),       // [34] 연금계좌 종목
+    fetchPub(GID_FAM,'C35:I46'),       // [35] 보연이계좌 종목
+    fetchPub(GID_FAM,'C48:I50'),       // [36] 산이계좌 종목
     fetchPub(GID_FAM,'B8'),            // [37] 내계좌 평가금액
     fetchPub(GID_FAM,'B22'),           // [38] 증여예정 평가금액
     fetchPub(GID_FAM,'B28'),           // [39] 연금계좌 평가금액
@@ -2033,26 +2034,70 @@ function initGoalInputs(){
 function updateAchieve(){
   const g=loadGoal();
   const d=DIVIDENDS[currentYear]||[];
-  const total=d.filter(v=>v!==null&&v>0).reduce((s,v)=>s+v,0);
-
-  // 목표를 원화로 통일
-  let goalKrw=0;
-  if(g.krw>0) goalKrw=g.krw;
-  else if(g.usd>0) goalKrw=Math.round(g.usd*SD.fxRate);
+  const totalKrw=d.filter(v=>v!==null&&v>0).reduce((s,v)=>s+v,0);
 
   const wrap=document.getElementById('div-achieve-wrap');
   if(!wrap) return;
 
+  // ── USD 목표: 실적도 USD 기준으로 비교 ──────────────────
+  if(g.usd>0 && g.krw===0){
+    // 실적 USD 산출
+    let totalUsd=0;
+    if(currentYear===2026){
+      if(SD.div2026Usd!=null && SD.div2026Usd>0){
+        totalUsd=SD.div2026Usd;
+      } else if(SD.div2026MonthlyUsd){
+        totalUsd=SD.div2026MonthlyUsd.filter(v=>v!=null&&v>0).reduce((s,v)=>s+v,0);
+      } else {
+        totalUsd=totalKrw>0?Math.round(totalKrw/SD.fxRate):0;
+      }
+    } else if(currentYear===2025){
+      if(SD.div2025MonthlyUsd){
+        totalUsd=SD.div2025MonthlyUsd.filter(v=>v!=null&&v>0).reduce((s,v)=>s+v,0);
+      } else {
+        totalUsd=totalKrw>0?Math.round(totalKrw/SD.fxRate):0;
+      }
+    }
+    const goalUsd=g.usd;
+    if(!goalUsd||!totalUsd){wrap.style.display='none';return;}
+    wrap.style.display='block';
+
+    const pct=Math.min(Math.round(totalUsd/goalUsd*1000)/10,999);
+    const barW=Math.min(pct,100);
+    const isDone=pct>=100;
+
+    document.getElementById('div-achieve-pct').textContent=pct.toFixed(1)+'%';
+    document.getElementById('div-achieve-pct').style.color=isDone?'var(--green)':'var(--accent)';
+    const bar=document.getElementById('div-achieve-bar');
+    bar.style.width=barW+'%';
+    bar.className='div-achieve-bar'+(isDone?' done':'');
+
+    const remain=goalUsd-totalUsd;
+    const goalDisp='$'+goalUsd.toLocaleString('en-US');
+    const remDisp=remain>0?'$'+Math.round(remain).toLocaleString('en-US'):'달성!';
+    const totalDisp='$'+Math.round(totalUsd).toLocaleString('en-US');
+    let detailStr=totalDisp+' / 목표 '+goalDisp;
+    if(!isDone) detailStr+=' · 잔여 '+remDisp;
+    else detailStr+=' 🎉';
+    document.getElementById('div-achieve-detail').textContent=detailStr;
+    return;
+  }
+
+  // ── 원화 목표: 기존 원화 비교 ────────────────────────────
+  const total=totalKrw;
+  let goalKrw=0;
+  if(g.krw>0) goalKrw=g.krw;
+  else if(g.usd>0) goalKrw=Math.round(g.usd*SD.fxRate);
+
   if(!goalKrw||!total){wrap.style.display='none';return;}
   wrap.style.display='block';
 
-  const pct=Math.min(Math.round(total/goalKrw*100),999);
+  const pct=Math.min(Math.round(total/goalKrw*1000)/10,999);
   const barW=Math.min(pct,100);
   const isDone=pct>=100;
 
-  document.getElementById('div-achieve-pct').textContent=pct+'%';
+  document.getElementById('div-achieve-pct').textContent=pct.toFixed(1)+'%';
   document.getElementById('div-achieve-pct').style.color=isDone?'var(--green)':'var(--accent)';
-
   const bar=document.getElementById('div-achieve-bar');
   bar.style.width=barW+'%';
   bar.className='div-achieve-bar'+(isDone?' done':'');
@@ -2062,13 +2107,12 @@ function updateAchieve(){
   const remDisp=remain>0?(remain>=10000?Math.round(remain/10000)+'만원':remain.toLocaleString()+'원'):'달성!';
   const totalDisp=total>=10000?Math.round(total/10000)+'만원':total.toLocaleString()+'원';
 
-  // 달러 목표인 경우 달러도 표시
   let detailStr=totalDisp+' / 목표 '+goalDisp;
-  if(g.usd>0&&g.krw===0) detailStr+=' ($'+g.usd.toLocaleString()+')';
   if(!isDone) detailStr+=' · 잔여 '+remDisp;
   else detailStr+=' 🎉';
   document.getElementById('div-achieve-detail').textContent=detailStr;
 }
+
 
 function renderDividend(){
   const d=DIVIDENDS[currentYear]||[];
@@ -2114,15 +2158,17 @@ function renderDividend(){
     })();
     const usdM=usdNum?'<span class="m-amt-usd">$'+usdNum.toLocaleString('en-US')+'</span>':'';
     const col=document.createElement('div');col.className='m-col';
-    col.innerHTML=`<div class="m-amt">${ok?'<span>'+fmtK(amt)+'</span>':''}${usdM}</div><div class="m-bar-wrap"><div class="m-bar${isCur?' current':ok?'':' empty'}" style="height:${hp}%"></div></div><div class="m-label">${i+1}</div>`;
+    const isPeak=(ok&&i===peakI);
+    col.innerHTML=`<div class="m-amt">${ok?'<span>'+fmtK(amt)+'</span>':''}${usdM}</div><div class="m-bar-wrap"><div class="m-bar${isPeak?' peak':isCur?' current':ok?'':' empty'}" style="height:${hp}%"></div></div><div class="m-label">${i+1}</div>`;
     bars.appendChild(col);
   });
   const body=document.getElementById('div-tbl-body');body.innerHTML='';
   const all=Object.values(DIVIDENDS).flat().filter(Boolean);const gMax=Math.max(...all);
   [2025,2026].forEach(y=>{
     const row=document.createElement('div');row.className='st-row';const rd=DIVIDENDS[y]||[];
+    const yMax=Math.max(...rd.map(v=>v||0));
     let cells=`<div style="font-weight:700;font-size:14px;color:${y===currentYear?'var(--accent)':'var(--text-sub)'}">${y}</div>`;
-    rd.forEach((v,ci)=>{const isM=v&&v===gMax;const isCur=y===currentYear&&v;
+    rd.forEach((v,ci)=>{const isM=v&&v===gMax;const isYearPeak=v&&v===yMax&&yMax>0;const isCur=y===currentYear&&v;
       const usdC=(()=>{
         if(!v)return'';
         let n=null;
@@ -2134,7 +2180,7 @@ function renderDividend(){
         }
         return n>0?'<span style="display:block;font-size:11px;color:#38bdf8;opacity:.85;margin-top:1px;">$'+n.toLocaleString('en-US')+'</span>':'';
       })();
-      cells+=`<div class="st-cell${isM?' hi':isCur?' now':''}">${v?fmtK(v):'—'}${usdC}</div>`;});
+      cells+=`<div class="st-cell${isM?' hi':isCur?' now':''}" style="${isYearPeak?'font-size:13px;font-weight:800;color:var(--gold);':''}">${v?fmtK(v):'—'}${usdC}</div>`;});
     row.innerHTML=cells;body.appendChild(row);
   });
   // 달성률 업데이트
