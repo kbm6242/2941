@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>산이네 자산관리 v116</title>
+<title>산이네 자산관리 v117</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=DM+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -209,7 +209,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .m-label{font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;}
 .summary-table{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:18px;}
 .st-header,.st-row{display:grid;grid-template-columns:58px repeat(12,1fr);padding:9px 16px;font-size:11px;font-family:'DM Mono',monospace;}
-.st-header{border-bottom:1px solid var(--border);color:var(--text-muted);}
+.st-header{border-bottom:1px solid var(--border);color:var(--text-sub);}
 .st-row{border-bottom:1px solid var(--border);color:var(--text-sub);font-size:12px;}
 .st-row:last-child{border-bottom:none;}
 .st-row:hover{background:var(--surface2);}
@@ -222,7 +222,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .hold-section-title span{font-size:13px;color:var(--text-muted);font-weight:400;font-family:'DM Mono',monospace;margin-left:8px;}
 .htable-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:22px;}
 .htable-wrap table{width:100%;border-collapse:collapse;}
-.htable-wrap th{padding:10px 15px;font-weight:700;color:var(--text-muted);border-bottom:1px solid var(--border);font-size:13px;text-align:left;background:var(--surface2);font-family:'DM Mono',monospace;}
+.htable-wrap th{padding:10px 15px;font-weight:700;color:var(--text-sub);border-bottom:1px solid var(--border);font-size:13px;text-align:left;background:var(--surface2);font-family:'DM Mono',monospace;}
 .htable-wrap th.r{text-align:right;}
 .htable-wrap td{padding:10px 15px;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:14px;}
 .htable-wrap tr:last-child td{border-bottom:none;}
@@ -233,7 +233,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .acc-total{float:right;font-size:15px;font-weight:800;font-family:'DM Mono',monospace;color:var(--text);}
 td.td-name{color:var(--text);font-weight:600;font-size:15px;}
 td.td-qty{text-align:right;color:var(--text-sub);}
-td.td-price{text-align:right;color:var(--text-muted);font-size:13px;}
+td.td-price{text-align:right;color:var(--text-sub);font-size:13px;}
 td.td-rate-pos{text-align:right;color:var(--red);font-weight:700;}
 td.td-rate-neg{text-align:right;color:var(--green);font-weight:700;}
 td.td-val{text-align:right;color:var(--text);}
@@ -990,20 +990,20 @@ async function loadAllSheetData(){
     fetchPub(GID_FAM,'C54'),           // [30] 총 매입원금
     fetchPub(GID_LOG,'L2:M10'),        // [31] 주요지수 fallback용 (실시간은 SCRIPT_URL)
     fetchPub(GID_FAM,'C8:I20'),        // [32] 내계좌 종목
-    fetchPub(GID_FAM,'C22:I28'),       // [33] 증여예정 종목
-    fetchPub(GID_FAM,'C30:I34'),       // [34] 연금계좌 종목
-    fetchPub(GID_FAM,'C37:I47'),       // [35] 보연이계좌 종목
-    fetchPub(GID_FAM,'C50:I52'),       // [36] 산이계좌 종목
+    fetchPub(GID_FAM,'C22:I26'),       // [33] 증여예정 종목
+    fetchPub(GID_FAM,'C28:I32'),       // [34] 연금계좌 종목
+    fetchPub(GID_FAM,'C35:I46'),       // [35] 보연이계좌 종목
+    fetchPub(GID_FAM,'C48:I50'),       // [36] 산이계좌 종목
     fetchPub(GID_FAM,'B8'),            // [37] 내계좌 평가금액
     fetchPub(GID_FAM,'B22'),           // [38] 증여예정 평가금액
-    fetchPub(GID_FAM,'B30'),           // [39] 연금계좌 평가금액
-    fetchPub(GID_FAM,'B37'),           // [40] 보연이계좌 평가금액
-    fetchPub(GID_FAM,'B50'),           // [41] 산이계좌 평가금액
+    fetchPub(GID_FAM,'B28'),           // [39] 연금계좌 평가금액
+    fetchPub(GID_FAM,'B35'),           // [40] 보연이계좌 평가금액
+    fetchPub(GID_FAM,'B48'),           // [41] 산이계좌 평가금액
     fetchPub(GID_FAM,'J8'),            // [42] 내계좌+연금+증여 원금합산
-    fetchPub(GID_FAM,'J37'),           // [43] 보연이계좌 원금
-    fetchPub(GID_FAM,'J50'),           // [44] 산이계좌 원금
+    fetchPub(GID_FAM,'J35'),           // [43] 보연이계좌 원금
+    fetchPub(GID_FAM,'J48'),           // [44] 산이계좌 원금
     fetchPub(GID_FAM,'J22'),           // [45] 증여예정 원금
-    fetchPub(GID_FAM,'J30'),           // [46] 연금계좌 원금
+    fetchPub(GID_FAM,'J28'),           // [46] 연금계좌 원금
     fetchPub(GID_2026,'D8:E10'),       // [47] 산이계좌 종목명/수량
     fetchPub(GID_2026,'D16:E26'),      // [48] 보연씌 종목명/수량
     fetchPub(GID_2026,'D32:E36'),      // [49] 증여예정 종목명/수량
