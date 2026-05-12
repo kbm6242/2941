@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>산이네 자산관리 v115</title>
+<title>산이네 자산관리 v116</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=DM+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -607,7 +607,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
   <div class="page" id="page-dividend">
     <!-- 목표 배당액 설정 -->
     <div class="div-goal-box">
-      <div class="div-goal-title">🎯 연간 배당 목표 설정</div>
+      <div class="div-goal-title">🎯 연간 배당 목표 설정 <span id="goal-year-badge" style="font-size:14px;color:var(--accent);font-family:'DM Mono',monospace;text-transform:none;letter-spacing:0;margin-left:6px;"></span></div>
       <div class="div-goal-inputs">
         <div class="div-goal-group">
           <span class="div-goal-lbl">💵 달러 목표</span>
@@ -621,6 +621,8 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
         <button class="div-goal-save" onclick="saveGoal()">저장</button>
         <span style="font-size:12px;color:var(--text-muted);margin-top:18px;" id="goal-saved-msg"></span>
       </div>
+      <!-- 저장된 목표 요약 -->
+      <div id="goal-all-summary" style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;"></div>
     </div>
 
     <div class="div-hero" style="grid-template-columns:auto 1fr auto;">
@@ -2012,24 +2014,66 @@ fetchExchangeRate();setInterval(fetchExchangeRate,5*60*1000);
 // ══════════════════════════════════════════
 //  배당 목표 설정
 // ══════════════════════════════════════════
-const GOAL_KEY='sanine_divgoal_v1';
+const GOAL_KEY='sanine_divgoal_v1';  // legacy
+const GOAL_KEY_V2='sanine_divgoal_v2';
 
+// ── 연도별 목표: { 2025:{usd,krw}, 2026:{usd,krw}, ... } ──
+function loadAllGoals(){
+  try{
+    const v2=JSON.parse(localStorage.getItem(GOAL_KEY_V2));
+    if(v2&&typeof v2==='object') return v2;
+    // v1 legacy → 현재 연도로 마이그레이션
+    const v1=JSON.parse(localStorage.getItem(GOAL_KEY));
+    if(v1&&(v1.usd||v1.krw)){
+      const migrated={};
+      migrated[currentYear]=v1;
+      return migrated;
+    }
+    return {};
+  }catch{return {};}
+}
 function loadGoal(){
-  try{return JSON.parse(localStorage.getItem(GOAL_KEY))||{usd:0,krw:0};}catch{return{usd:0,krw:0};}
+  const all=loadAllGoals();
+  return all[currentYear]||{usd:0,krw:0};
 }
 function saveGoal(){
   const usd=parseFloat(document.getElementById('goal-usd').value)||0;
   const krw=parseFloat(document.getElementById('goal-krw').value)||0;
-  localStorage.setItem(GOAL_KEY,JSON.stringify({usd,krw}));
+  const all=loadAllGoals();
+  all[currentYear]={usd,krw};
+  localStorage.setItem(GOAL_KEY_V2,JSON.stringify(all));
   const msg=document.getElementById('goal-saved-msg');
-  msg.textContent='✓ 저장됨';
+  msg.textContent='✓ '+currentYear+'년 저장됨';
   setTimeout(()=>{msg.textContent='';},2000);
   updateAchieve();
 }
 function initGoalInputs(){
   const g=loadGoal();
-  if(g.usd) document.getElementById('goal-usd').value=g.usd;
-  if(g.krw) document.getElementById('goal-krw').value=g.krw;
+  document.getElementById('goal-usd').value=g.usd||'';
+  document.getElementById('goal-krw').value=g.krw||'';
+  // 연도 배지 업데이트
+  const badge=document.getElementById('goal-year-badge');
+  if(badge) badge.textContent='('+currentYear+'년)';
+  // 전체 연도별 목표 요약 렌더
+  renderGoalSummary();
+}
+function renderGoalSummary(){
+  const wrap=document.getElementById('goal-all-summary');
+  if(!wrap) return;
+  const all=loadAllGoals();
+  const years=Object.keys(all).map(Number).sort();
+  if(years.length===0){wrap.innerHTML='';return;}
+  wrap.innerHTML=years.map(y=>{
+    const g=all[y];
+    const goalStr=g.usd>0?'$'+g.usd.toLocaleString('en-US'):g.krw>0?(g.krw>=10000?Math.round(g.krw/10000)+'만원':g.krw.toLocaleString()+'원'):'—';
+    const isActive=y===currentYear;
+    return `<div onclick="switchGoalYear(${y})" style="cursor:pointer;padding:6px 14px;border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;font-weight:700;border:1.5px solid ${isActive?'var(--accent)':'var(--border2)'};background:${isActive?'var(--accent-dim)':'transparent'};color:${isActive?'var(--accent)':'var(--text-muted)'};transition:all .15s;">${y}년<br><span style="font-size:12px;font-weight:400;">${goalStr}</span></div>`;
+  }).join('');
+}
+function switchGoalYear(y){
+  // 연도 전환 (setYear 활용)
+  setYear(y, document.querySelector('.year-btn[onclick*="'+y+'"]'));
+  initGoalInputs();
 }
 function updateAchieve(){
   const g=loadGoal();
@@ -2185,6 +2229,8 @@ function renderDividend(){
   });
   // 달성률 업데이트
   updateAchieve();
+  // 목표 입력창 연도 동기화
+  initGoalInputs();
 }
 
 // ══════════════════════════════════════════
@@ -2634,10 +2680,10 @@ function switchHoldings(type,el){
 function setYear(y,btn){
   currentYear=y;
   document.querySelectorAll('.year-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  if(btn) btn.classList.add('active');
   updateCards();
   if(currentPage==='trend')renderTrend();
-  if(currentPage==='dividend')renderDividend();
+  if(currentPage==='dividend'){renderDividend();initGoalInputs();}
 }
 function setPeriod(p){
   currentPeriod=p;
