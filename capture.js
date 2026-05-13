@@ -26,7 +26,8 @@ const CAPTURES = [
     viewport: { width: 1800, height: 900 },
     output: 'images/heatmap_nasdaq.png',
     runAt: 'US',
-@@ -31,104 +31,104 @@
+  },
+  {
     name: 'Russell 2000',
     url: 'https://finviz.com/map.ashx?t=sec_rut',
     waitMs: 8000,
