@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>산이네 자산관리 v117</title>
+<title>산이네 자산관리 v119</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=DM+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -968,49 +968,50 @@ async function loadAllSheetData(){
     fetchPub(GID_FAM,'O25:O37'),  // [9] 보연씌 2026 (13값)
     fetchPub(GID_FAM,'O41:O53'),  // [10] 산이 2026 (13값)
     // ★ 2026 배당 (GID_2026)
-    fetchPub(GID_2026,'L56:W56'), // [11] 2026 월별 배당합계 (12개)
+    fetchPub(GID_2026,'L58:W58'), // [11] 2026 월별 배당합계 (12개)
     fetchPub(GID_2026,'L8:W8'),   // [12] 산이: NVDW 월별배당
     fetchPub(GID_2026,'L10:W10'), // [13] 산이: 2번째 종목
-    fetchPub(GID_2026,'L16:W16'), // [14] 보연씌: AMDW
-    fetchPub(GID_2026,'L18:W18'), // [15] 보연씌: METW
+    fetchPub(GID_2026,'L16:W16'), // [14] 보연씌: 엔비디아
+    fetchPub(GID_2026,'L18:W18'), // [15] 보연씌: AMDW
     fetchPub(GID_2026,'L20:W20'), // [16] 보연씌: CHPY
-    fetchPub(GID_2026,'L22:W22'), // [17] 보연씌: PLTW
-    fetchPub(GID_2026,'L24:W24'), // [18] 보연씌: GOOW
-    fetchPub(GID_2026,'L26:W26'), // [19] 보연씌: 6번째
-    fetchPub(GID_2026,'L32:W32'), // [20] 증여예정: NVDW
-    fetchPub(GID_2026,'L34:W34'), // [21] 증여예정: 테라다인
-    fetchPub(GID_2026,'L36:W36'), // [22] 증여예정: 3번째
-    fetchPub(GID_2026,'L42:W42'), // [23] 내계좌: TSLW
-    fetchPub(GID_2026,'L44:W44'), // [24] 내계좌: PLTW
-    fetchPub(GID_2026,'L46:W46'), // [25] 연금: 미국배당커버드콜
-    fetchPub(GID_2026,'L48:W48'), // [26] 연금: TOP10
-    fetchPub(GID_2026,'L50:W50'), // [27] 연금: 나스닥100
-    fetchPub(GID_2026,'J8:J56'),  // [28] J열 전체 (연배당금액)
-    fetchPub(GID_LOG,'A2:F500'),    // [29] 일별자산기록 전체
-    fetchPub(GID_FAM,'C54'),           // [30] 총 매입원금
-    fetchPub(GID_LOG,'L2:M10'),        // [31] 주요지수 fallback용 (실시간은 SCRIPT_URL)
-    fetchPub(GID_FAM,'C8:I20'),        // [32] 내계좌 종목
-    fetchPub(GID_FAM,'C22:I28'),       // [33] 증여예정 종목
-    fetchPub(GID_FAM,'C30:I34'),       // [34] 연금계좌 종목
-    fetchPub(GID_FAM,'C37:I47'),       // [35] 보연이계좌 종목
-    fetchPub(GID_FAM,'C50:I52'),       // [36] 산이계좌 종목
-    fetchPub(GID_FAM,'B8'),            // [37] 내계좌 평가금액
-    fetchPub(GID_FAM,'B22'),           // [38] 증여예정 평가금액
-    fetchPub(GID_FAM,'B28'),           // [39] 연금계좌 평가금액
-    fetchPub(GID_FAM,'B35'),           // [40] 보연이계좌 평가금액
-    fetchPub(GID_FAM,'B48'),           // [41] 산이계좌 평가금액
-    fetchPub(GID_FAM,'J8'),            // [42] 내계좌+연금+증여 원금합산
-    fetchPub(GID_FAM,'J37'),           // [43] 보연이계좌 원금
-    fetchPub(GID_FAM,'J50'),           // [44] 산이계좌 원금
-    fetchPub(GID_FAM,'J22'),           // [45] 증여예정 원금
-    fetchPub(GID_FAM,'J30'),           // [46] 연금계좌 원금
-    fetchPub(GID_2026,'D8:E10'),       // [47] 산이계좌 종목명/수량
-    fetchPub(GID_2026,'D16:E26'),      // [48] 보연씌 종목명/수량
-    fetchPub(GID_2026,'D32:E36'),      // [49] 증여예정 종목명/수량
-    fetchPub(GID_2026,'D42:E44'),      // [50] 내계좌 종목명/수량
-    fetchPub(GID_2026,'D46:E50'),      // [51] 연금계좌 종목명/수량
-    fetchPub(GID_2026,'D5'),           // [52] 2026 달러 배당 합계
-    fetchPub(GID_2026,'L57:W57'),      // [53] 2026 월별 달러 배당
+    fetchPub(GID_2026,'L22:W22'), // [17] 보연씌: GOOW
+    fetchPub(GID_2026,'L24:W24'), // [18] 보연씌: PLTW
+    fetchPub(GID_2026,'L26:W26'), // [19] 보연씌: METW
+    fetchPub(GID_2026,'L32:W32'), // [20] 증여예정: 엔비디아
+    fetchPub(GID_2026,'L34:W34'), // [21] 증여예정: NVDW
+    fetchPub(GID_2026,'L36:W36'), // [22] 증여예정: 테라다인
+    fetchPub(GID_2026,'L38:W38'), // [23] 증여예정: 버티브홀딩스
+    fetchPub(GID_2026,'L44:W44'), // [24] 내계좌: TSLW
+    fetchPub(GID_2026,'L46:W46'), // [25] 내계좌: GOOW
+    fetchPub(GID_2026,'L48:W48'), // [26] 연금: 미국배당커버드콜
+    fetchPub(GID_2026,'L50:W50'), // [27] 연금: TOP10
+    fetchPub(GID_2026,'L52:W52'), // [28] 연금: 나스닥100
+    fetchPub(GID_2026,'J8:J56'),  // [29] J열 전체 (연배당금액)
+    fetchPub(GID_LOG,'A2:F500'),    // [30] 일별자산기록 전체
+    fetchPub(GID_FAM,'C54'),           // [31] 총 매입원금
+    fetchPub(GID_LOG,'L2:M10'),        // [32] 주요지수 fallback용 (실시간은 SCRIPT_URL)
+    fetchPub(GID_FAM,'C8:I20'),        // [33] 내계좌 종목
+    fetchPub(GID_FAM,'C22:I28'),       // [34] 증여예정 종목 (버티브 추가로 범위 확장)
+    fetchPub(GID_FAM,'C30:I34'),       // [35] 연금계좌 종목
+    fetchPub(GID_FAM,'C37:I47'),       // [36] 보연이계좌 종목
+    fetchPub(GID_FAM,'C50:I52'),       // [37] 산이계좌 종목
+    fetchPub(GID_FAM,'B8'),            // [38] 내계좌 평가금액
+    fetchPub(GID_FAM,'B22'),           // [39] 증여예정 평가금액
+    fetchPub(GID_FAM,'B30'),           // [40] 연금계좌 평가금액
+    fetchPub(GID_FAM,'B37'),           // [41] 보연이계좌 평가금액
+    fetchPub(GID_FAM,'B50'),           // [42] 산이계좌 평가금액
+    fetchPub(GID_FAM,'J8'),            // [43] 내계좌+연금+증여 원금합산
+    fetchPub(GID_FAM,'J37'),           // [44] 보연이계좌 원금
+    fetchPub(GID_FAM,'J50'),           // [45] 산이계좌 원금
+    fetchPub(GID_FAM,'J22'),           // [46] 증여예정 원금
+    fetchPub(GID_FAM,'J30'),           // [47] 연금계좌 원금
+    fetchPub(GID_2026,'D8:E10'),       // [48] 산이계좌 종목명/수량
+    fetchPub(GID_2026,'D16:E26'),      // [49] 보연씌 종목명/수량
+    fetchPub(GID_2026,'D32:E38'),      // [50] 증여예정 종목명/수량 (버티브 추가)
+    fetchPub(GID_2026,'D44:E46'),      // [51] 내계좌 종목명/수량
+    fetchPub(GID_2026,'D48:E52'),      // [52] 연금계좌 종목명/수량
+    fetchPub(GID_2026,'D5'),           // [53] 2026 달러 배당 합계
+    fetchPub(GID_2026,'L59:W59'),      // [54] 2026 월별 달러 배당
   ]);
 
   let ok=0;
@@ -1051,16 +1052,16 @@ async function loadAllSheetData(){
   SD.mon2026.san=padArr(pCol(results[10]),13);
 
   // [30] 총 매입원금 C54
-  const buyFromSheet=pNum(results[30]);
+  const buyFromSheet=pNum(results[31]);
   SD.buyTotal=(buyFromSheet&&buyFromSheet>0)?buyFromSheet:null;
 
   // ── [32~36] 계좌별 고정 범위 종목 파싱 → HOLDINGS_ALL 업데이트
   const ACC_DEF = [
-    {idx:32, tidx:37, acc:'내계좌',     num:'207-01-565134', color:'#a78bfa'},
-    {idx:33, tidx:38, acc:'증여예정',   num:'207-01-869011', color:'#a78bfa'},
-    {idx:34, tidx:39, acc:'연금계좌',   num:'207-03-565134', color:'#a78bfa'},
-    {idx:35, tidx:40, acc:'보연이계좌', num:'208-01-705156', color:'#f472b6'},
-    {idx:36, tidx:41, acc:'산이계좌',   num:'207-01-869075', color:'#38bdf8'},
+    {idx:33, tidx:38, acc:'내계좌',     num:'207-01-565134', color:'#a78bfa'},
+    {idx:34, tidx:39, acc:'증여예정',   num:'207-01-869011', color:'#a78bfa'},
+    {idx:35, tidx:40, acc:'연금계좌',   num:'207-03-565134', color:'#a78bfa'},
+    {idx:36, tidx:41, acc:'보연이계좌', num:'208-01-705156', color:'#f472b6'},
+    {idx:37, tidx:42, acc:'산이계좌',   num:'207-01-869075', color:'#38bdf8'},
   ];
   const parseItems = rows => {
     const items = [];
@@ -1098,14 +1099,14 @@ async function loadAllSheetData(){
     if(!r||r.status!=='fulfilled') return null;
     return parseSingle(r.value);
   };
-  SD.naeBuy = (pN(42)||0)+(pN(45)||0)+(pN(46)||0)||null;  // 내계좌+증여예정+연금
-  SD.boyBuy = pN(43);   // 보연이계좌 원금
-  SD.sanBuy = pN(44);   // 산이계좌 원금
+  SD.naeBuy = (pN(43)||0)+(pN(46)||0)+(pN(47)||0)||null;  // 내계좌+증여예정+연금
+  SD.boyBuy = pN(44);   // 보연이계좌 원금
+  SD.sanBuy = pN(45);   // 산이계좌 원금
 
   // [29] 일별자산기록 시트 → SD.dailyLog 파싱
   SD.dailyLog=[];
-  if(results[29]&&results[29].status==='fulfilled'){
-    const rows=parseCSV(results[29].value);
+  if(results[30]&&results[30].status==='fulfilled'){
+    const rows=parseCSV(results[30].value);
     rows.forEach(r=>{
       if(!r[0])return;
       // A=날짜(Date or 문자열), B=총자산, C=내계좌, D=보연씌, E=산이계좌, F=매입원금
@@ -1141,10 +1142,10 @@ async function loadAllSheetData(){
     }
   } catch(e) {
     // 실시간 실패 시 pubURL fallback
-    if(results[31]&&results[31].status==='fulfilled'){
+    if(results[32]&&results[32].status==='fulfilled'){
       try{
         const toNum=v=>{const n=parseFloat(String(v).replace(/[^0-9.-]/g,''));return isNaN(n)?null:n;};
-        const rows=parseCSV(results[31].value);
+        const rows=parseCSV(results[32].value);
         const mktData=[];
         IDX_LIST.forEach((ix)=>{
           const r=rows[ix.rowIdx]||[];
@@ -1199,23 +1200,23 @@ async function loadAllSheetData(){
     }).filter(Boolean);
   };
 
-  // J8:J56 파싱 (results[28])
+  // J8:J56 파싱 (results[29])
   let jFullArr = [];
-  if(results[28]&&results[28].status==='fulfilled'){
-    jFullArr = parseSingleCol(results[28].value).map(v=>v);
+  if(results[29]&&results[29].status==='fulfilled'){
+    jFullArr = parseSingleCol(results[29].value).map(v=>v);
   }
 
   const newDivData = [
     {acc:'내계좌', color:'#a78bfa',
-     items: parseDivItems(results[50],[results[23],results[24]],jFullArr,[34,36])},
+     items: parseDivItems(results[51],[results[24],results[25]],jFullArr,[36,38])},
     {acc:'증여예정', color:'#a78bfa',
-     items: parseDivItems(results[49],[results[20],results[21],results[22]],jFullArr,[24,26,28])},
+     items: parseDivItems(results[50],[results[20],results[21],results[22],results[23]],jFullArr,[24,26,28,30])},
     {acc:'연금계좌', color:'#a78bfa',
-     items: parseDivItems(results[51],[results[25],results[26],results[27]],jFullArr,[38,40,42])},
+     items: parseDivItems(results[52],[results[26],results[27],results[28]],jFullArr,[40,42,44])},
     {acc:'보연씌계좌', color:'#f472b6',
-     items: parseDivItems(results[48],[results[14],results[15],results[16],results[17],results[18],results[19]],jFullArr,[8,10,12,14,16,18])},
+     items: parseDivItems(results[49],[results[14],results[15],results[16],results[17],results[18],results[19]],jFullArr,[8,10,12,14,16,18])},
     {acc:'산이계좌', color:'#38bdf8',
-     items: parseDivItems(results[47],[results[12],results[13]],jFullArr,[0,2])},
+     items: parseDivItems(results[48],[results[12],results[13]],jFullArr,[0,2])},
   ].filter(sec=>sec.items.length>0);
 
   if(newDivData.length>0){
@@ -1258,14 +1259,14 @@ async function loadAllSheetData(){
     DIVIDENDS[2026]=raw;
     SD.div2026=raw;
   }
-  // [52] 2026 달러 배당 합계 (D5)
-  if(results[52]&&results[52].status==='fulfilled'){
-    const v=parseSingle(results[52].value);
+  // [53] 2026 달러 배당 합계 (D5)
+  if(results[53]&&results[53].status==='fulfilled'){
+    const v=parseSingle(results[53].value);
     if(v!==null) SD.div2026Usd=v;
   }
   // [53] 2026 월별 달러 배당 (L57:W57)
-  if(results[53]&&results[53].status==='fulfilled'){
-    const cols=parseCSV(results[53].value);
+  if(results[54]&&results[54].status==='fulfilled'){
+    const cols=parseCSV(results[54].value);
     if(cols&&cols[0]) SD.div2026MonthlyUsd=cols[0].map(v=>{
       if(!v||v===''||v==='-'||v==='—')return null;
       const n=parseFloat(String(v).replace(/[^0-9.-]/g,''));
