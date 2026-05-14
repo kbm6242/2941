@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>산이네 자산관리 v119</title>
+<title>산이네 자산관리 v127</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=DM+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -800,29 +800,31 @@ const HOLDINGS_ALL=[
 // ══════════════════════════════════════════
 let HOLDINGS_DIV=[
   {acc:'내계좌',color:'#a78bfa',items:[
-    {name:'TSLW', qty:135,annual:'₩596,417',m:['₩187,455','₩171,737','₩147,651','₩89,553',null,null,null,null,null,null,null,null]},
-    {name:'PLTW', qty:84, annual:'₩412,333',m:['₩123,115','₩78,102','₩127,832','₩83,298',null,null,null,null,null,null,null,null]},
+    {name:'TSLW', qty:135,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
+    {name:'GOOW', qty:24, annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
   ]},
   {acc:'증여예정',color:'#a78bfa',items:[
-    {name:'엔비디아', qty:34,annual:'—',       m:['—','—','—','—',null,null,null,null,null,null,null,null]},
-    {name:'NVDW',    qty:34,annual:'₩193,588',m:['₩53,455','₩52,189','₩53,816','₩34,114',null,null,null,null,null,null,null,null]},
-    {name:'테라다인', qty:5, annual:'₩162',    m:['—','—','₩162','—',null,null,null,null,null,null,null,null]},
+    {name:'엔비디아',    qty:76,annual:'—',       m:[null,null,null,null,null,null,null,null,null,null,null,null]},
+    {name:'NVDW',       qty:35,annual:'—',       m:[null,null,null,null,null,null,null,null,null,null,null,null]},
+    {name:'테라다인',    qty:3, annual:'—',       m:[null,null,null,null,null,null,null,null,null,null,null,null]},
+    {name:'버티브홀딩스',qty:2, annual:'—',       m:[null,null,null,null,null,null,null,null,null,null,null,null]},
   ]},
   {acc:'연금계좌',color:'#a78bfa',items:[
-    {name:'미국배당커버드콜액티브',          qty:210,annual:'₩82,950',  m:['₩20,580','₩20,790','₩20,790','₩20,790',null,null,null,null,null,null,null,null]},
-    {name:'미국테크TOP10타겟커버드콜',       qty:359,annual:'₩184,488', m:['₩47,838','₩46,182','₩45,234','₩45,234',null,null,null,null,null,null,null,null]},
-    {name:'미국나스닥100타겟데일리커버드콜', qty:126,annual:'₩41,145',  m:['₩6,646','₩9,246','₩11,557','₩13,696',null,null,null,null,null,null,null,null]},
+    {name:'미국배당커버드콜액티브',          qty:210,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
+    {name:'미국테크TOP10타겟커버드콜',       qty:360,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
+    {name:'미국나스닥100타겟데일리커버드콜', qty:126,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
   ]},
   {acc:'보연씌계좌',color:'#f472b6',items:[
-    {name:'AMDW',qty:10,annual:'₩101,465',m:['₩39,212','₩21,347','₩20,831','₩20,081',null,null,null,null,null,null,null,null]},
-    {name:'METW',qty:50,annual:'₩183,187',m:['₩52,322','₩57,912','₩41,005','₩31,991',null,null,null,null,null,null,null,null]},
-    {name:'CHPY',qty:33,annual:'₩248,991',m:['₩88,045','₩65,924','₩63,211','₩31,880',null,null,null,null,null,null,null,null]},
-    {name:'PLTW',qty:50,annual:'₩274,869',m:['₩88,045','₩54,264','₩81,398','₩51,205',null,null,null,null,null,null,null,null]},
-    {name:'GOOW',qty:40,annual:'₩328,492',m:['₩101,208','₩82,764','₩88,454','₩56,147',null,null,null,null,null,null,null,null]},
+    {name:'AMDW',qty:30,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
+    {name:'METW',qty:50,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
+    {name:'CHPY',qty:33,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
+    {name:'PLTW',qty:50,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
+    {name:'GOOW',qty:40,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
+    {name:'엔비디아',qty:100,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
   ]},
   {acc:'산이계좌',color:'#38bdf8',items:[
-    {name:'엔비디아', qty:500,annual:'—',m:['—','—','—','—',null,null,null,null,null,null,null,null]},
-    {name:'NVDW',    qty:45, annual:'₩235,677',m:['₩62,023','₩63,715','₩65,790','₩44,149',null,null,null,null,null,null,null,null]},
+    {name:'엔비디아', qty:500,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
+    {name:'NVDW',     qty:45, annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
   ]},
 ];
 
@@ -1008,10 +1010,13 @@ async function loadAllSheetData(){
     fetchPub(GID_2026,'D8:E10'),       // [48] 산이계좌 종목명/수량
     fetchPub(GID_2026,'D16:E26'),      // [49] 보연씌 종목명/수량
     fetchPub(GID_2026,'D32:E38'),      // [50] 증여예정 종목명/수량 (버티브 추가)
-    fetchPub(GID_2026,'D44:E46'),      // [51] 내계좌 종목명/수량
-    fetchPub(GID_2026,'D48:E52'),      // [52] 연금계좌 종목명/수량
+    fetchPub(GID_2026,'D44:E44'),      // [51] 내계좌: TSLW 종목명/수량
+    fetchPub(GID_2026,'D48:E48'),      // [52] 연금: 커버드콜 종목명/수량
     fetchPub(GID_2026,'D5'),           // [53] 2026 달러 배당 합계
     fetchPub(GID_2026,'L59:W59'),      // [54] 2026 월별 달러 배당
+    fetchPub(GID_2026,'D46:E46'),      // [55] 내계좌: GOOW 종목명/수량
+    fetchPub(GID_2026,'D50:E50'),      // [56] 연금: TOP10 종목명/수량
+    fetchPub(GID_2026,'D52:E52'),      // [57] 연금: 나스닥100 종목명/수량
   ]);
 
   let ok=0;
@@ -1206,13 +1211,42 @@ async function loadAllSheetData(){
     jFullArr = parseSingleCol(results[29].value).map(v=>v);
   }
 
+  // 단일 종목 직접 빌드 (D열 범위 파싱 순서 의존 제거 → 행 번호 1:1 매핑)
+  const buildItem = (deRes, lwRes, jArr, jOffset) => {
+    if(!deRes||deRes.status!=='fulfilled') return null;
+    const rows = parseCSV(deRes.value);
+    const row = rows.find(r=>(r[0]||'').trim()) || rows[0];
+    if(!row) return null;
+    const name = (row[0]||'').trim().replace(/\s*\(.*?\)\s*$/, '').trim();
+    if(!name) return null;
+    const qty = parseInt((row[1]||'0').replace(/[^0-9]/g,''))||0;
+    let mArr = Array(12).fill(null);
+    if(lwRes&&lwRes.status==='fulfilled'){
+      const cols = parseCSV(lwRes.value)[0]||[];
+      mArr = cols.map(v=>{ const raw=(v||''); const n=parseFloat(raw.replace(/[^0-9.-]/g,'')); if(isNaN(n)||n===0) return null; const krw = (raw.indexOf('$')>=0) ? Math.round(n*SD.fxRate) : Math.round(n); return '\u20a9'+krw.toLocaleString('ko-KR'); });
+      while(mArr.length<12) mArr.push(null);
+    }
+    let annual = '\u2014';
+    if(jArr&&jOffset!==undefined){ const jv=jArr[jOffset]; if(jv!=null&&jv!==''){ const jn=parseFloat(String(jv).replace(/[^0-9.-]/g,'')); if(!isNaN(jn)&&jn>0){ const jKrw=String(jv).indexOf('$')>=0?Math.round(jn*SD.fxRate):Math.round(jn); annual='\u20a9'+jKrw.toLocaleString('ko-KR'); } } }
+    const hasDivData = mArr.some(v=>v!==null)||annual!=='\u2014';
+    if(qty===0&&!hasDivData) return null;
+    return {name, qty, annual, m:mArr};
+  };
+
   const newDivData = [
     {acc:'내계좌', color:'#a78bfa',
-     items: parseDivItems(results[51],[results[24],results[25]],jFullArr,[36,38])},
+     items: [
+       buildItem(results[51], results[24], jFullArr, 36),
+       buildItem(results[55], results[25], jFullArr, 38),
+     ].filter(Boolean)},
     {acc:'증여예정', color:'#a78bfa',
      items: parseDivItems(results[50],[results[20],results[21],results[22],results[23]],jFullArr,[24,26,28,30])},
     {acc:'연금계좌', color:'#a78bfa',
-     items: parseDivItems(results[52],[results[26],results[27],results[28]],jFullArr,[40,42,44])},
+     items: [
+       buildItem(results[52], results[26], jFullArr, 40),
+       buildItem(results[56], results[27], jFullArr, 42),
+       buildItem(results[57], results[28], jFullArr, 44),
+     ].filter(Boolean)},
     {acc:'보연씌계좌', color:'#f472b6',
      items: parseDivItems(results[49],[results[14],results[15],results[16],results[17],results[18],results[19]],jFullArr,[8,10,12,14,16,18])},
     {acc:'산이계좌', color:'#38bdf8',
@@ -1221,7 +1255,8 @@ async function loadAllSheetData(){
 
   if(newDivData.length>0){
     HOLDINGS_DIV.length=0;
-    newDivData.forEach(s=>HOLDINGS_DIV.push(s));
+    HOLDINGS_DIV.length=0;
+  newDivData.forEach(s=>HOLDINGS_DIV.push(s));
   }
 
   const sheetOK=ok>=3;
@@ -1277,22 +1312,23 @@ async function loadAllSheetData(){
   // 종목별 월별 배당 파싱
   // 시트 행 순서 ↔ HOLDINGS_DIV 종목 순서 1:1 매핑
   const divRowMap=[
-    {acc:'산이계좌', idx:12},  // L8:W8   → 엔비디아(직접)
-    {acc:'산이계좌', idx:13},  // L10:W10 → NVDW
-    {acc:'보연씌계좌', idx:14},           // L16:W16 → AMDW
-    {acc:'보연씌계좌', idx:15},           // L18:W18 → METW
-    {acc:'보연씌계좌', idx:16},           // L20:W20 → CHPY
-    {acc:'보연씌계좌', idx:17},           // L22:W22 → PLTW
-    {acc:'보연씌계좌', idx:18},           // L24:W24 → GOOW
-    {acc:'보연씌계좌', idx:19},           // L26:W26 → (6번째 skip)
-    {acc:'증여예정',   idx:20},           // L32:W32 → 엔비디아
-    {acc:'증여예정',   idx:21},           // L34:W34 → NVDW
-    {acc:'증여예정',   idx:22},           // L36:W36 → 테라다인
-    {acc:'내계좌',     idx:23},           // L42:W42 → TSLW
-    {acc:'내계좌',     idx:24},           // L44:W44 → PLTW
-    {acc:'연금계좌',   idx:25},           // L46:W46 → 미국배당커버드콜
-    {acc:'연금계좌',   idx:26},           // L48:W48 → TOP10
-    {acc:'연금계좌',   idx:27},           // L50:W50 → 나스닥100
+    {acc:'산이계좌',   idx:12},  // L8:W8   → 엔비디아(직접)
+    {acc:'산이계좌',   idx:13},  // L10:W10 → NVDW
+    {acc:'보연씌계좌', idx:14},  // L16:W16 → AMDW
+    {acc:'보연씌계좌', idx:15},  // L18:W18 → METW
+    {acc:'보연씌계좌', idx:16},  // L20:W20 → CHPY
+    {acc:'보연씌계좌', idx:17},  // L22:W22 → PLTW
+    {acc:'보연씌계좌', idx:18},  // L24:W24 → GOOW
+    {acc:'보연씌계좌', idx:19},  // L26:W26 → 엔비디아
+    {acc:'증여예정',   idx:20},  // L32:W32 → 엔비디아
+    {acc:'증여예정',   idx:21},  // L34:W34 → NVDW
+    {acc:'증여예정',   idx:22},  // L36:W36 → 테라다인
+    {acc:'증여예정',   idx:23},  // L38:W38 → 버티브홀딩스
+    {acc:'내계좌',     idx:24},  // L44:W44 → TSLW
+    {acc:'내계좌',     idx:25},  // L46:W46 → GOOW
+    {acc:'연금계좌',   idx:26},  // L48:W48 → 미국배당커버드콜
+    {acc:'연금계좌',   idx:27},  // L50:W50 → TOP10
+    {acc:'연금계좌',   idx:28},  // L52:W52 → 나스닥100
   ];
 
   // HOLDINGS_DIV의 m 배열을 시트 데이터로 업데이트
