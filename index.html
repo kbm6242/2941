@@ -968,23 +968,24 @@ async function loadAllSheetData(){
     fetchPub(GID_FAM,'O25:O37'),  // [9] 보연씌 2026 (13값)
     fetchPub(GID_FAM,'O41:O53'),  // [10] 산이 2026 (13값)
     // ★ 2026 배당 (GID_2026)
-    fetchPub(GID_2026,'L56:W56'), // [11] 2026 월별 배당합계 (12개)
+    fetchPub(GID_2026,'L58:W58'), // [11] 2026 월별 배당합계 (12개)
     fetchPub(GID_2026,'L8:W8'),   // [12] 산이: NVDW 월별배당
     fetchPub(GID_2026,'L10:W10'), // [13] 산이: 2번째 종목
-    fetchPub(GID_2026,'L16:W16'), // [14] 보연씌: AMDW
-    fetchPub(GID_2026,'L18:W18'), // [15] 보연씌: METW
+    fetchPub(GID_2026,'L16:W16'), // [14] 보연씌: 엔비디아
+    fetchPub(GID_2026,'L18:W18'), // [15] 보연씌: AMDW
     fetchPub(GID_2026,'L20:W20'), // [16] 보연씌: CHPY
-    fetchPub(GID_2026,'L22:W22'), // [17] 보연씌: PLTW
-    fetchPub(GID_2026,'L24:W24'), // [18] 보연씌: GOOW
-    fetchPub(GID_2026,'L26:W26'), // [19] 보연씌: 6번째
-    fetchPub(GID_2026,'L32:W32'), // [20] 증여예정: NVDW
-    fetchPub(GID_2026,'L34:W34'), // [21] 증여예정: 테라다인
-    fetchPub(GID_2026,'L36:W36'), // [22] 증여예정: 3번째
-    fetchPub(GID_2026,'L42:W42'), // [23] 내계좌: TSLW
-    fetchPub(GID_2026,'L44:W44'), // [24] 내계좌: PLTW
-    fetchPub(GID_2026,'L46:W46'), // [25] 연금: 미국배당커버드콜
-    fetchPub(GID_2026,'L48:W48'), // [26] 연금: TOP10
-    fetchPub(GID_2026,'L50:W50'), // [27] 연금: 나스닥100
+    fetchPub(GID_2026,'L22:W22'), // [17] 보연씌: GOOW
+    fetchPub(GID_2026,'L24:W24'), // [18] 보연씌: PLTW
+    fetchPub(GID_2026,'L26:W26'), // [19] 보연씌: METW
+    fetchPub(GID_2026,'L32:W32'), // [20] 증여예정: 엔비디아
+    fetchPub(GID_2026,'L34:W34'), // [21] 증여예정: NVDW
+    fetchPub(GID_2026,'L36:W36'), // [22] 증여예정: 테라다인
+    fetchPub(GID_2026,'L38:W38'), // [22] 증여예정: 버티브홀딩스
+    fetchPub(GID_2026,'L44:W44'), // [23] 내계좌: TSLW
+    fetchPub(GID_2026,'L46:W46'), // [24] 내계좌: GOOW
+    fetchPub(GID_2026,'L48:W48'), // [25] 연금: 미국배당커버드콜
+    fetchPub(GID_2026,'L50:W50'), // [26] 연금: TOP10
+    fetchPub(GID_2026,'L52:W52'), // [27] 연금: 나스닥100
     fetchPub(GID_2026,'J8:J56'),  // [28] J열 전체 (연배당금액)
     fetchPub(GID_LOG,'A2:F500'),    // [29] 일별자산기록 전체
     fetchPub(GID_FAM,'C54'),           // [30] 총 매입원금
@@ -1006,11 +1007,11 @@ async function loadAllSheetData(){
     fetchPub(GID_FAM,'J30'),           // [46] 연금계좌 원금
     fetchPub(GID_2026,'D8:E10'),       // [47] 산이계좌 종목명/수량
     fetchPub(GID_2026,'D16:E26'),      // [48] 보연씌 종목명/수량
-    fetchPub(GID_2026,'D32:E36'),      // [49] 증여예정 종목명/수량
-    fetchPub(GID_2026,'D42:E44'),      // [50] 내계좌 종목명/수량
-    fetchPub(GID_2026,'D46:E50'),      // [51] 연금계좌 종목명/수량
+    fetchPub(GID_2026,'D32:E38'),      // [49] 증여예정 종목명/수량
+    fetchPub(GID_2026,'D44:E46'),      // [50] 내계좌 종목명/수량
+    fetchPub(GID_2026,'D48:E52'),      // [51] 연금계좌 종목명/수량
     fetchPub(GID_2026,'D5'),           // [52] 2026 달러 배당 합계
-    fetchPub(GID_2026,'L57:W57'),      // [53] 2026 월별 달러 배당
+    fetchPub(GID_2026,'L59:W59'),      // [53] 2026 월별 달러 배당
   ]);
 
   let ok=0;
