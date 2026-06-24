@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>산이네 자산관리 v127</title>
+<title>산이네 자산관리 v129</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=DM+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -205,11 +205,10 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .m-bar:hover{background:rgba(56,189,248,.22);}
 .m-bar.current{background:var(--accent);box-shadow:0 0 14px rgba(56,189,248,.35);}
 .m-bar.empty{background:var(--border);opacity:.3;}
-.m-bar.peak{background:linear-gradient(180deg,#f59e0b,#f97316);box-shadow:0 0 14px rgba(245,158,11,.5);}
 .m-label{font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;}
 .summary-table{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:18px;}
 .st-header,.st-row{display:grid;grid-template-columns:58px repeat(12,1fr);padding:9px 16px;font-size:11px;font-family:'DM Mono',monospace;}
-.st-header{border-bottom:1px solid var(--border);color:var(--text-sub);}
+.st-header{border-bottom:1px solid var(--border);color:var(--text-muted);}
 .st-row{border-bottom:1px solid var(--border);color:var(--text-sub);font-size:12px;}
 .st-row:last-child{border-bottom:none;}
 .st-row:hover{background:var(--surface2);}
@@ -222,7 +221,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .hold-section-title span{font-size:13px;color:var(--text-muted);font-weight:400;font-family:'DM Mono',monospace;margin-left:8px;}
 .htable-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:22px;}
 .htable-wrap table{width:100%;border-collapse:collapse;}
-.htable-wrap th{padding:10px 15px;font-weight:700;color:var(--text-sub);border-bottom:1px solid var(--border);font-size:13px;text-align:left;background:var(--surface2);font-family:'DM Mono',monospace;}
+.htable-wrap th{padding:10px 15px;font-weight:700;color:var(--text-muted);border-bottom:1px solid var(--border);font-size:13px;text-align:left;background:var(--surface2);font-family:'DM Mono',monospace;}
 .htable-wrap th.r{text-align:right;}
 .htable-wrap td{padding:10px 15px;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:14px;}
 .htable-wrap tr:last-child td{border-bottom:none;}
@@ -233,7 +232,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .acc-total{float:right;font-size:15px;font-weight:800;font-family:'DM Mono',monospace;color:var(--text);}
 td.td-name{color:var(--text);font-weight:600;font-size:15px;}
 td.td-qty{text-align:right;color:var(--text-sub);}
-td.td-price{text-align:right;color:var(--text-sub);font-size:13px;}
+td.td-price{text-align:right;color:var(--text-muted);font-size:13px;}
 td.td-rate-pos{text-align:right;color:var(--red);font-weight:700;}
 td.td-rate-neg{text-align:right;color:var(--green);font-weight:700;}
 td.td-val{text-align:right;color:var(--text);}
@@ -477,7 +476,6 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
       <div class="hm-tab" id="htab-nasdaq" onclick="switchHeatmap('nasdaq')">🖥 Nasdaq 100</div>
       <div class="hm-tab" id="htab-russell" onclick="switchHeatmap('russell')">📊 Russell 2000</div>
       <div class="hm-tab" id="htab-kospi" onclick="switchHeatmap('kospi')">코스피</div>
-      <div class="hm-tab" id="htab-kosdaq" onclick="switchHeatmap('kosdaq')">코스닥</div>
     </div>
     <!-- S&P 500 -->
     <div class="hm-frame-wrap" id="hm-sp500">
@@ -525,18 +523,6 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
       <div class="hm-img-wrap" id="hm-img-kospi">
         <img id="hm-img-kospi-img" data-src="./images/heatmap_kospi.png" alt="코스피 히트맵"
           onerror="this.parentNode.innerHTML='<div class='hm-no-img'>📷 이미지 없음<br><span>GitHub Actions가 매일 KST 16:00에 자동 캡처합니다</span><br><a href='https://markets.hankyung.com/heatmap/kospi' target='_blank' class='hm-open-btn' style='margin-top:12px;'>📊 한경에서 보기</a></div>'">
-      </div>
-    </div>
-    <!-- 코스닥 -->
-    <div class="hm-frame-wrap" id="hm-kosdaq" style="display:none;">
-      <div class="hm-img-header">
-        <span class="hm-update-badge">🕓 매일 KST 16:00 자동 업데이트</span>
-        <span class="hm-date-badge" id="hm-date-kosdaq">—</span>
-        <a class="hm-open-btn" href="https://markets.hankyung.com/heatmap/kosdaq" target="_blank">🔗 한경 실시간 보기</a>
-      </div>
-      <div class="hm-img-wrap" id="hm-img-kosdaq">
-        <img id="hm-img-kosdaq-img" data-src="./images/heatmap_kosdaq.png" alt="코스닥 히트맵"
-          onerror="this.parentNode.innerHTML='<div class=\'hm-no-img\'>📷 이미지 없음<br><span>GitHub Actions가 매일 KST 16:00에 자동 캡처합니다</span><br><a href=\'https://markets.hankyung.com/heatmap/kosdaq\' target=\'_blank\' class=\'hm-open-btn\' style=\'margin-top:12px;\'>📊 한경에서 보기</a></div>'">
       </div>
     </div>
   </div>
@@ -607,7 +593,7 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
   <div class="page" id="page-dividend">
     <!-- 목표 배당액 설정 -->
     <div class="div-goal-box">
-      <div class="div-goal-title">🎯 연간 배당 목표 설정 <span id="goal-year-badge" style="font-size:14px;color:var(--accent);font-family:'DM Mono',monospace;text-transform:none;letter-spacing:0;margin-left:6px;"></span></div>
+      <div class="div-goal-title">🎯 연간 배당 목표 설정</div>
       <div class="div-goal-inputs">
         <div class="div-goal-group">
           <span class="div-goal-lbl">💵 달러 목표</span>
@@ -621,8 +607,6 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
         <button class="div-goal-save" onclick="saveGoal()">저장</button>
         <span style="font-size:12px;color:var(--text-muted);margin-top:18px;" id="goal-saved-msg"></span>
       </div>
-      <!-- 저장된 목표 요약 -->
-      <div id="goal-all-summary" style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;"></div>
     </div>
 
     <div class="div-hero" style="grid-template-columns:auto 1fr auto;">
@@ -768,7 +752,8 @@ const HOLDINGS_ALL=[
     {name:'앱셀레라 바이오로직스',      qty:80,  cur:'$3.91',    buy:'$3.73',    amt:'$298.40',     rate:'+4.83%',   val:'₩460,174'},
     {name:'조비 에비에이션',            qty:117, cur:'$9.14',    buy:'$11.16',   amt:'$1,305.72',   rate:'-18.10%',  val:'₩1,573,213'},
     {name:'TSLW',              qty:135, cur:'$24.34',   buy:'$34.25',   amt:'$4,623.75',   rate:'-28.93%',  val:'₩4,834,035'},
-    {name:'PLTW',              qty:84,  cur:'$24.39',   buy:'$38.33',   amt:'$3,219.72',   rate:'-36.37%',  val:'₩3,014,023'},
+    {name:'GOOW',              qty:24,  cur:'$68.41',   buy:'$64.97',   amt:'$1,559.28',   rate:'+5.29%',   val:'₩2,415,385'},
+    {name:'CHPY',              qty:33,  cur:'$64.75',   buy:'$61.16',   amt:'$2,018.28',   rate:'+5.87%',   val:'₩3,143,469'},
     {name:'테슬라',                     qty:8,   cur:'$392.50',  buy:'$331.72',  amt:'$2,653.76',   rate:'+18.32%',  val:'₩4,619,395'},
   ]},
   {acc:'증여예정',num:'207-01-869011',total:'27,028,656원',color:'#a78bfa',items:[
@@ -802,29 +787,29 @@ let HOLDINGS_DIV=[
   {acc:'내계좌',color:'#a78bfa',items:[
     {name:'TSLW', qty:135,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
     {name:'GOOW', qty:24, annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
+    {name:'CHPY', qty:33, annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
   ]},
   {acc:'증여예정',color:'#a78bfa',items:[
-    {name:'엔비디아',    qty:76,annual:'—',       m:[null,null,null,null,null,null,null,null,null,null,null,null]},
-    {name:'NVDW',       qty:35,annual:'—',       m:[null,null,null,null,null,null,null,null,null,null,null,null]},
-    {name:'테라다인',    qty:3, annual:'—',       m:[null,null,null,null,null,null,null,null,null,null,null,null]},
-    {name:'버티브홀딩스',qty:2, annual:'—',       m:[null,null,null,null,null,null,null,null,null,null,null,null]},
+    {name:'엔비디아',    qty:34,annual:'—',        m:['—','—','—','—',null,null,null,null,null,null,null,null]},
+    {name:'NVDW',       qty:34,annual:'₩193,588', m:['₩53,455','₩52,189','₩53,816','₩34,114',null,null,null,null,null,null,null,null]},
+    {name:'테라다인',    qty:5, annual:'₩162',     m:['—','—','₩162','—',null,null,null,null,null,null,null,null]},
+    {name:'버티브홀딩스', qty:0, annual:'—',       m:[null,null,null,null,null,null,null,null,null,null,null,null]},
   ]},
   {acc:'연금계좌',color:'#a78bfa',items:[
-    {name:'미국배당커버드콜액티브',          qty:210,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
-    {name:'미국테크TOP10타겟커버드콜',       qty:360,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
-    {name:'미국나스닥100타겟데일리커버드콜', qty:126,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
+    {name:'미국배당커버드콜액티브',          qty:210,annual:'₩82,950',  m:['₩20,580','₩20,790','₩20,790','₩20,790',null,null,null,null,null,null,null,null]},
+    {name:'미국테크TOP10타겟커버드콜',       qty:359,annual:'₩184,488', m:['₩47,838','₩46,182','₩45,234','₩45,234',null,null,null,null,null,null,null,null]},
+    {name:'미국나스닥100타겟데일리커버드콜', qty:126,annual:'₩41,145',  m:['₩6,646','₩9,246','₩11,557','₩13,696',null,null,null,null,null,null,null,null]},
   ]},
   {acc:'보연씌계좌',color:'#f472b6',items:[
-    {name:'AMDW',qty:30,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
-    {name:'METW',qty:50,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
-    {name:'CHPY',qty:33,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
-    {name:'PLTW',qty:50,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
-    {name:'GOOW',qty:40,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
-    {name:'엔비디아',qty:100,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
+    {name:'AMDW',qty:10,annual:'₩101,465',m:['₩39,212','₩21,347','₩20,831','₩20,081',null,null,null,null,null,null,null,null]},
+    {name:'METW',qty:50,annual:'₩183,187',m:['₩52,322','₩57,912','₩41,005','₩31,991',null,null,null,null,null,null,null,null]},
+    {name:'CHPY',qty:33,annual:'₩248,991',m:['₩88,045','₩65,924','₩63,211','₩31,880',null,null,null,null,null,null,null,null]},
+    {name:'PLTW',qty:50,annual:'₩274,869',m:['₩88,045','₩54,264','₩81,398','₩51,205',null,null,null,null,null,null,null,null]},
+    {name:'GOOW',qty:40,annual:'₩328,492',m:['₩101,208','₩82,764','₩88,454','₩56,147',null,null,null,null,null,null,null,null]},
   ]},
   {acc:'산이계좌',color:'#38bdf8',items:[
-    {name:'엔비디아', qty:500,annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
-    {name:'NVDW',     qty:45, annual:'—',m:[null,null,null,null,null,null,null,null,null,null,null,null]},
+    {name:'엔비디아', qty:500,annual:'—',m:['—','—','—','—',null,null,null,null,null,null,null,null]},
+    {name:'NVDW',    qty:45, annual:'₩235,677',m:['₩62,023','₩63,715','₩65,790','₩44,149',null,null,null,null,null,null,null,null]},
   ]},
 ];
 
@@ -967,56 +952,54 @@ async function loadAllSheetData(){
     fetchPub(GID_2025,'W83:W94'),   // [7] 산이 2025 (25.1~25.12, 12값)
     // ★ 2026 월별 (GID_FAM)
     fetchPub(GID_FAM,'O9:O21'),  // [8] 내계좌 2026 (13값)
-    fetchPub(GID_FAM,'O25:O37'),  // [9] 보연씌 2026 (13값)
-    fetchPub(GID_FAM,'O41:O53'),  // [10] 산이 2026 (13값)
+    fetchPub(GID_FAM,'O27:O39'),  // [9] 보연씌 2026 (13값)
+    fetchPub(GID_FAM,'O43:O55'),  // [10] 산이 2026 (13값)
     // ★ 2026 배당 (GID_2026)
-    fetchPub(GID_2026,'L58:W58'), // [11] 2026 월별 배당합계 (12개)
+    fetchPub(GID_2026,'L60:W60'), // [11] 2026 월별 배당합계 (12개)
     fetchPub(GID_2026,'L8:W8'),   // [12] 산이: NVDW 월별배당
     fetchPub(GID_2026,'L10:W10'), // [13] 산이: 2번째 종목
-    fetchPub(GID_2026,'L16:W16'), // [14] 보연씌: 엔비디아
-    fetchPub(GID_2026,'L18:W18'), // [15] 보연씌: AMDW
+    fetchPub(GID_2026,'L16:W16'), // [14] 보연씌: AMDW
+    fetchPub(GID_2026,'L18:W18'), // [15] 보연씌: METW
     fetchPub(GID_2026,'L20:W20'), // [16] 보연씌: CHPY
-    fetchPub(GID_2026,'L22:W22'), // [17] 보연씌: GOOW
-    fetchPub(GID_2026,'L24:W24'), // [18] 보연씌: PLTW
-    fetchPub(GID_2026,'L26:W26'), // [19] 보연씌: METW
-    fetchPub(GID_2026,'L32:W32'), // [20] 증여예정: 엔비디아
-    fetchPub(GID_2026,'L34:W34'), // [21] 증여예정: NVDW
-    fetchPub(GID_2026,'L36:W36'), // [22] 증여예정: 테라다인
-    fetchPub(GID_2026,'L38:W38'), // [23] 증여예정: 버티브홀딩스
-    fetchPub(GID_2026,'L44:W44'), // [24] 내계좌: TSLW
-    fetchPub(GID_2026,'L46:W46'), // [25] 내계좌: GOOW
-    fetchPub(GID_2026,'L48:W48'), // [26] 연금: 미국배당커버드콜
-    fetchPub(GID_2026,'L50:W50'), // [27] 연금: TOP10
-    fetchPub(GID_2026,'L52:W52'), // [28] 연금: 나스닥100
-    fetchPub(GID_2026,'J8:J56'),  // [29] J열 전체 (연배당금액)
-    fetchPub(GID_LOG,'A2:F500'),    // [30] 일별자산기록 전체
-    fetchPub(GID_FAM,'C54'),           // [31] 총 매입원금
-    fetchPub(GID_LOG,'L2:M10'),        // [32] 주요지수 fallback용 (실시간은 SCRIPT_URL)
-    fetchPub(GID_FAM,'C8:I20'),        // [33] 내계좌 종목
-    fetchPub(GID_FAM,'C22:I28'),       // [34] 증여예정 종목 (버티브 추가로 범위 확장)
-    fetchPub(GID_FAM,'C30:I34'),       // [35] 연금계좌 종목
-    fetchPub(GID_FAM,'C37:I47'),       // [36] 보연이계좌 종목
-    fetchPub(GID_FAM,'C50:I52'),       // [37] 산이계좌 종목
-    fetchPub(GID_FAM,'B8'),            // [38] 내계좌 평가금액
-    fetchPub(GID_FAM,'B22'),           // [39] 증여예정 평가금액
-    fetchPub(GID_FAM,'B30'),           // [40] 연금계좌 평가금액
-    fetchPub(GID_FAM,'B37'),           // [41] 보연이계좌 평가금액
-    fetchPub(GID_FAM,'B50'),           // [42] 산이계좌 평가금액
-    fetchPub(GID_FAM,'J8'),            // [43] 내계좌+연금+증여 원금합산
-    fetchPub(GID_FAM,'J37'),           // [44] 보연이계좌 원금
-    fetchPub(GID_FAM,'J50'),           // [45] 산이계좌 원금
-    fetchPub(GID_FAM,'J22'),           // [46] 증여예정 원금
-    fetchPub(GID_FAM,'J30'),           // [47] 연금계좌 원금
-    fetchPub(GID_2026,'D8:E10'),       // [48] 산이계좌 종목명/수량
-    fetchPub(GID_2026,'D16:E26'),      // [49] 보연씌 종목명/수량
-    fetchPub(GID_2026,'D32:E38'),      // [50] 증여예정 종목명/수량 (버티브 추가)
-    fetchPub(GID_2026,'D44:E44'),      // [51] 내계좌: TSLW 종목명/수량
-    fetchPub(GID_2026,'D48:E48'),      // [52] 연금: 커버드콜 종목명/수량
-    fetchPub(GID_2026,'D5'),           // [53] 2026 달러 배당 합계
-    fetchPub(GID_2026,'L59:W59'),      // [54] 2026 월별 달러 배당
-    fetchPub(GID_2026,'D46:E46'),      // [55] 내계좌: GOOW 종목명/수량
-    fetchPub(GID_2026,'D50:E50'),      // [56] 연금: TOP10 종목명/수량
-    fetchPub(GID_2026,'D52:E52'),      // [57] 연금: 나스닥100 종목명/수량
+    fetchPub(GID_2026,'L22:W22'), // [17] 보연씌: PLTW
+    fetchPub(GID_2026,'L24:W24'), // [18] 보연씌: GOOW
+    fetchPub(GID_2026,'L26:W26'), // [19] 보연씌: 6번째
+    fetchPub(GID_2026,'L32:W32'), // [20] 증여예정: NVDW
+    fetchPub(GID_2026,'L34:W34'), // [21] 증여예정: 테라다인
+    fetchPub(GID_2026,'L36:W36'), // [22] 증여예정: 3번째
+    fetchPub(GID_2026,'L44:W44'), // [23] 내계좌: TSLW
+    fetchPub(GID_2026,'L46:W46'), // [24] 내계좌: GOOW
+    fetchPub(GID_2026,'L50:W50'), // [25] 연금: 미국배당커버드콜
+    fetchPub(GID_2026,'L52:W52'), // [26] 연금: TOP10
+    fetchPub(GID_2026,'L54:W54'), // [27] 연금: 나스닥100
+    fetchPub(GID_2026,'J8:J56'),  // [28] J열 전체 (연배당금액)
+    fetchPub(GID_LOG,'A2:F500'),    // [29] 일별자산기록 전체
+    fetchPub(GID_FAM,'R6'),           // [30] 총 매입원금
+    fetchPub(GID_LOG,'L2:M10'),        // [31] 주요지수 fallback용 (실시간은 SCRIPT_URL)
+    fetchPub(GID_FAM,'C8:I22'),        // [32] 내계좌 종목
+    fetchPub(GID_FAM,'C24:I30'),       // [33] 증여예정 종목
+    fetchPub(GID_FAM,'C32:I36'),       // [34] 연금계좌 종목
+    fetchPub(GID_FAM,'C39:I49'),       // [35] 보연이계좌 종목
+    fetchPub(GID_FAM,'C52:I54'),       // [36] 산이계좌 종목
+    fetchPub(GID_FAM,'B8'),            // [37] 내계좌 평가금액
+    fetchPub(GID_FAM,'B24'),           // [38] 증여예정 평가금액
+    fetchPub(GID_FAM,'B32'),           // [39] 연금계좌 평가금액
+    fetchPub(GID_FAM,'B39'),           // [40] 보연이계좌 평가금액
+    fetchPub(GID_FAM,'B52'),           // [41] 산이계좌 평가금액
+    fetchPub(GID_FAM,'J8'),            // [42] 내계좌+연금+증여 원금합산
+    fetchPub(GID_FAM,'J39'),           // [43] 보연이계좌 원금
+    fetchPub(GID_FAM,'J52'),           // [44] 산이계좌 원금
+    fetchPub(GID_FAM,'J24'),           // [45] 증여예정 원금
+    fetchPub(GID_FAM,'J32'),           // [46] 연금계좌 원금
+    fetchPub(GID_2026,'D8:E10'),       // [47] 산이계좌 종목명/수량
+    fetchPub(GID_2026,'D16:E26'),      // [48] 보연씌 종목명/수량
+    fetchPub(GID_2026,'D32:E39'),      // [49] 증여예정 종목명/수량
+    fetchPub(GID_2026,'D42:E44'),      // [50] 내계좌 종목명/수량
+    fetchPub(GID_2026,'D50:E55'),      // [51] 연금계좌 종목명/수량
+    fetchPub(GID_2026,'D5'),           // [52] 2026 달러 배당 합계
+    fetchPub(GID_2026,'L61:W61'),      // [53] 2026 월별 달러 배당
+    fetchPub(GID_2026,'L48:W48'),      // [54] 내계좌: CHPY 월별배당
+    fetchPub(GID_2026,'L38:W38'),      // [55] 증여예정: 버티브홀딩스 월별배당
   ]);
 
   let ok=0;
@@ -1057,16 +1040,16 @@ async function loadAllSheetData(){
   SD.mon2026.san=padArr(pCol(results[10]),13);
 
   // [30] 총 매입원금 C54
-  const buyFromSheet=pNum(results[31]);
+  const buyFromSheet=pNum(results[30]);
   SD.buyTotal=(buyFromSheet&&buyFromSheet>0)?buyFromSheet:null;
 
   // ── [32~36] 계좌별 고정 범위 종목 파싱 → HOLDINGS_ALL 업데이트
   const ACC_DEF = [
-    {idx:33, tidx:38, acc:'내계좌',     num:'207-01-565134', color:'#a78bfa'},
-    {idx:34, tidx:39, acc:'증여예정',   num:'207-01-869011', color:'#a78bfa'},
-    {idx:35, tidx:40, acc:'연금계좌',   num:'207-03-565134', color:'#a78bfa'},
-    {idx:36, tidx:41, acc:'보연이계좌', num:'208-01-705156', color:'#f472b6'},
-    {idx:37, tidx:42, acc:'산이계좌',   num:'207-01-869075', color:'#38bdf8'},
+    {idx:32, tidx:37, acc:'내계좌',     num:'207-01-565134', color:'#a78bfa'},
+    {idx:33, tidx:38, acc:'증여예정',   num:'207-01-869011', color:'#a78bfa'},
+    {idx:34, tidx:39, acc:'연금계좌',   num:'207-03-565134', color:'#a78bfa'},
+    {idx:35, tidx:40, acc:'보연이계좌', num:'208-01-705156', color:'#f472b6'},
+    {idx:36, tidx:41, acc:'산이계좌',   num:'207-01-869075', color:'#38bdf8'},
   ];
   const parseItems = rows => {
     const items = [];
@@ -1104,14 +1087,14 @@ async function loadAllSheetData(){
     if(!r||r.status!=='fulfilled') return null;
     return parseSingle(r.value);
   };
-  SD.naeBuy = (pN(43)||0)+(pN(46)||0)+(pN(47)||0)||null;  // 내계좌+증여예정+연금
-  SD.boyBuy = pN(44);   // 보연이계좌 원금
-  SD.sanBuy = pN(45);   // 산이계좌 원금
+  SD.naeBuy = (pN(42)||0)+(pN(45)||0)+(pN(46)||0)||null;  // 내계좌+증여예정+연금
+  SD.boyBuy = pN(43);   // 보연이계좌 원금
+  SD.sanBuy = pN(44);   // 산이계좌 원금
 
   // [29] 일별자산기록 시트 → SD.dailyLog 파싱
   SD.dailyLog=[];
-  if(results[30]&&results[30].status==='fulfilled'){
-    const rows=parseCSV(results[30].value);
+  if(results[29]&&results[29].status==='fulfilled'){
+    const rows=parseCSV(results[29].value);
     rows.forEach(r=>{
       if(!r[0])return;
       // A=날짜(Date or 문자열), B=총자산, C=내계좌, D=보연씌, E=산이계좌, F=매입원금
@@ -1147,10 +1130,10 @@ async function loadAllSheetData(){
     }
   } catch(e) {
     // 실시간 실패 시 pubURL fallback
-    if(results[32]&&results[32].status==='fulfilled'){
+    if(results[31]&&results[31].status==='fulfilled'){
       try{
         const toNum=v=>{const n=parseFloat(String(v).replace(/[^0-9.-]/g,''));return isNaN(n)?null:n;};
-        const rows=parseCSV(results[32].value);
+        const rows=parseCSV(results[31].value);
         const mktData=[];
         IDX_LIST.forEach((ix)=>{
           const r=rows[ix.rowIdx]||[];
@@ -1205,58 +1188,32 @@ async function loadAllSheetData(){
     }).filter(Boolean);
   };
 
-  // J8:J56 파싱 (results[29])
+  // J8:J56 파싱 (results[28])
   let jFullArr = [];
-  if(results[29]&&results[29].status==='fulfilled'){
-    jFullArr = parseSingleCol(results[29].value).map(v=>v);
+  if(results[28]&&results[28].status==='fulfilled'){
+    jFullArr = parseSingleCol(results[28].value).map(v=>v);
   }
-
-  // 단일 종목 직접 빌드 (D열 범위 파싱 순서 의존 제거 → 행 번호 1:1 매핑)
-  const buildItem = (deRes, lwRes, jArr, jOffset) => {
-    if(!deRes||deRes.status!=='fulfilled') return null;
-    const rows = parseCSV(deRes.value);
-    const row = rows.find(r=>(r[0]||'').trim()) || rows[0];
-    if(!row) return null;
-    const name = (row[0]||'').trim().replace(/\s*\(.*?\)\s*$/, '').trim();
-    if(!name) return null;
-    const qty = parseInt((row[1]||'0').replace(/[^0-9]/g,''))||0;
-    let mArr = Array(12).fill(null);
-    if(lwRes&&lwRes.status==='fulfilled'){
-      const cols = parseCSV(lwRes.value)[0]||[];
-      mArr = cols.map(v=>{ const raw=(v||''); const n=parseFloat(raw.replace(/[^0-9.-]/g,'')); if(isNaN(n)||n===0) return null; const krw = (raw.indexOf('$')>=0) ? Math.round(n*SD.fxRate) : Math.round(n); return '\u20a9'+krw.toLocaleString('ko-KR'); });
-      while(mArr.length<12) mArr.push(null);
-    }
-    let annual = '\u2014';
-    if(jArr&&jOffset!==undefined){ const jv=jArr[jOffset]; if(jv!=null&&jv!==''){ const jn=parseFloat(String(jv).replace(/[^0-9.-]/g,'')); if(!isNaN(jn)&&jn>0){ const jKrw=String(jv).indexOf('$')>=0?Math.round(jn*SD.fxRate):Math.round(jn); annual='\u20a9'+jKrw.toLocaleString('ko-KR'); } } }
-    const hasDivData = mArr.some(v=>v!==null)||annual!=='\u2014';
-    if(qty===0&&!hasDivData) return null;
-    return {name, qty, annual, m:mArr};
-  };
 
   const newDivData = [
     {acc:'내계좌', color:'#a78bfa',
      items: [
-       buildItem(results[51], results[24], jFullArr, 36),
-       buildItem(results[55], results[25], jFullArr, 38),
-     ].filter(Boolean)},
+       ...parseDivItems(results[50],[results[23]],jFullArr,[36]),
+       ...parseDivItems(results[56],[results[24]],jFullArr,[38]),
+       ...parseDivItems(results[57],[results[54]],jFullArr,[40]),
+     ]},
     {acc:'증여예정', color:'#a78bfa',
-     items: parseDivItems(results[50],[results[20],results[21],results[22],results[23]],jFullArr,[24,26,28,30])},
+     items: parseDivItems(results[49],[results[20],results[21],results[22],results[55]],jFullArr,[24,26,28,30])},
     {acc:'연금계좌', color:'#a78bfa',
-     items: [
-       buildItem(results[52], results[26], jFullArr, 40),
-       buildItem(results[56], results[27], jFullArr, 42),
-       buildItem(results[57], results[28], jFullArr, 44),
-     ].filter(Boolean)},
+     items: parseDivItems(results[51],[results[25],results[26],results[27]],jFullArr,[42,44,46])},
     {acc:'보연씌계좌', color:'#f472b6',
-     items: parseDivItems(results[49],[results[14],results[15],results[16],results[17],results[18],results[19]],jFullArr,[8,10,12,14,16,18])},
+     items: parseDivItems(results[48],[results[14],results[15],results[16],results[17],results[18],results[19]],jFullArr,[8,10,12,14,16,18])},
     {acc:'산이계좌', color:'#38bdf8',
-     items: parseDivItems(results[48],[results[12],results[13]],jFullArr,[0,2])},
+     items: parseDivItems(results[47],[results[12],results[13]],jFullArr,[0,2])},
   ].filter(sec=>sec.items.length>0);
 
   if(newDivData.length>0){
     HOLDINGS_DIV.length=0;
-    HOLDINGS_DIV.length=0;
-  newDivData.forEach(s=>HOLDINGS_DIV.push(s));
+    newDivData.forEach(s=>HOLDINGS_DIV.push(s));
   }
 
   const sheetOK=ok>=3;
@@ -1294,14 +1251,14 @@ async function loadAllSheetData(){
     DIVIDENDS[2026]=raw;
     SD.div2026=raw;
   }
-  // [53] 2026 달러 배당 합계 (D5)
-  if(results[53]&&results[53].status==='fulfilled'){
-    const v=parseSingle(results[53].value);
+  // [52] 2026 달러 배당 합계 (D5)
+  if(results[52]&&results[52].status==='fulfilled'){
+    const v=parseSingle(results[52].value);
     if(v!==null) SD.div2026Usd=v;
   }
   // [53] 2026 월별 달러 배당 (L57:W57)
-  if(results[54]&&results[54].status==='fulfilled'){
-    const cols=parseCSV(results[54].value);
+  if(results[53]&&results[53].status==='fulfilled'){
+    const cols=parseCSV(results[53].value);
     if(cols&&cols[0]) SD.div2026MonthlyUsd=cols[0].map(v=>{
       if(!v||v===''||v==='-'||v==='—')return null;
       const n=parseFloat(String(v).replace(/[^0-9.-]/g,''));
@@ -1319,16 +1276,17 @@ async function loadAllSheetData(){
     {acc:'보연씌계좌', idx:16},  // L20:W20 → CHPY
     {acc:'보연씌계좌', idx:17},  // L22:W22 → PLTW
     {acc:'보연씌계좌', idx:18},  // L24:W24 → GOOW
-    {acc:'보연씌계좌', idx:19},  // L26:W26 → 엔비디아
+    {acc:'보연씌계좌', idx:19},  // L26:W26 → 6번째
     {acc:'증여예정',   idx:20},  // L32:W32 → 엔비디아
     {acc:'증여예정',   idx:21},  // L34:W34 → NVDW
     {acc:'증여예정',   idx:22},  // L36:W36 → 테라다인
-    {acc:'증여예정',   idx:23},  // L38:W38 → 버티브홀딩스
-    {acc:'내계좌',     idx:24},  // L44:W44 → TSLW
-    {acc:'내계좌',     idx:25},  // L46:W46 → GOOW
-    {acc:'연금계좌',   idx:26},  // L48:W48 → 미국배당커버드콜
-    {acc:'연금계좌',   idx:27},  // L50:W50 → TOP10
-    {acc:'연금계좌',   idx:28},  // L52:W52 → 나스닥100
+    {acc:'증여예정',   idx:55},  // L38:W38 → 버티브홀딩스 (신규)
+    {acc:'내계좌',     idx:23},  // L44:W44 → TSLW
+    {acc:'내계좌',     idx:24},  // L46:W46 → GOOW
+    {acc:'내계좌',     idx:54},  // L48:W48 → CHPY (신규)
+    {acc:'연금계좌',   idx:25},  // L50:W50 → 미국배당커버드콜
+    {acc:'연금계좌',   idx:26},  // L52:W52 → TOP10
+    {acc:'연금계좌',   idx:27},  // L54:W54 → 나스닥100
   ];
 
   // HOLDINGS_DIV의 m 배열을 시트 데이터로 업데이트
@@ -1611,7 +1569,7 @@ function calcTotalBuy(){
 async function fetchAndStoreDailyEntry(){
   const sTxt=document.getElementById('status-txt');sTxt.textContent='오늘 데이터 저장 중…';sTxt.className='s-loading';
   try{
-    const [r0,r1,r2,r3,r4,r5,r6,r7,r8,r9]=await Promise.all([fetchPub(GID_FAM,'C3'),fetchPub(GID_FAM,'K3'),fetchPub(GID_FAM,'M3'),fetchPub(GID_FAM,'O3'),fetchPub(GID_FAM,'C54'),fetchPub(GID_FAM,'J8'),fetchPub(GID_FAM,'J35'),fetchPub(GID_FAM,'J48'),fetchPub(GID_FAM,'J22'),fetchPub(GID_FAM,'J28')]);
+    const [r0,r1,r2,r3,r4,r5,r6,r7,r8,r9]=await Promise.all([fetchPub(GID_FAM,'C3'),fetchPub(GID_FAM,'K3'),fetchPub(GID_FAM,'M3'),fetchPub(GID_FAM,'O3'),fetchPub(GID_FAM,'R6'),fetchPub(GID_FAM,'J8'),fetchPub(GID_FAM,'J39'),fetchPub(GID_FAM,'J52'),fetchPub(GID_FAM,'J24'),fetchPub(GID_FAM,'J32')]);
     const sheetBuy=parseSingle(r4);
     const buy=sheetBuy&&sheetBuy>0?sheetBuy:calcTotalBuy();
     const naeBuy=((parseSingle(r5)||0)+(parseSingle(r8)||0)+(parseSingle(r9)||0))||null;
@@ -2051,134 +2009,48 @@ fetchExchangeRate();setInterval(fetchExchangeRate,5*60*1000);
 // ══════════════════════════════════════════
 //  배당 목표 설정
 // ══════════════════════════════════════════
-const GOAL_KEY='sanine_divgoal_v1';  // legacy
-const GOAL_KEY_V2='sanine_divgoal_v2';
+const GOAL_KEY='sanine_divgoal_v1';
 
-// ── 연도별 목표: { 2025:{usd,krw}, 2026:{usd,krw}, ... } ──
-function loadAllGoals(){
-  try{
-    const v2=JSON.parse(localStorage.getItem(GOAL_KEY_V2));
-    if(v2&&typeof v2==='object') return v2;
-    // v1 legacy → 현재 연도로 마이그레이션
-    const v1=JSON.parse(localStorage.getItem(GOAL_KEY));
-    if(v1&&(v1.usd||v1.krw)){
-      const migrated={};
-      migrated[currentYear]=v1;
-      return migrated;
-    }
-    return {};
-  }catch{return {};}
-}
 function loadGoal(){
-  const all=loadAllGoals();
-  return all[currentYear]||{usd:0,krw:0};
+  try{return JSON.parse(localStorage.getItem(GOAL_KEY))||{usd:0,krw:0};}catch{return{usd:0,krw:0};}
 }
 function saveGoal(){
   const usd=parseFloat(document.getElementById('goal-usd').value)||0;
   const krw=parseFloat(document.getElementById('goal-krw').value)||0;
-  const all=loadAllGoals();
-  all[currentYear]={usd,krw};
-  localStorage.setItem(GOAL_KEY_V2,JSON.stringify(all));
+  localStorage.setItem(GOAL_KEY,JSON.stringify({usd,krw}));
   const msg=document.getElementById('goal-saved-msg');
-  msg.textContent='✓ '+currentYear+'년 저장됨';
+  msg.textContent='✓ 저장됨';
   setTimeout(()=>{msg.textContent='';},2000);
   updateAchieve();
 }
 function initGoalInputs(){
   const g=loadGoal();
-  document.getElementById('goal-usd').value=g.usd||'';
-  document.getElementById('goal-krw').value=g.krw||'';
-  // 연도 배지 업데이트
-  const badge=document.getElementById('goal-year-badge');
-  if(badge) badge.textContent='('+currentYear+'년)';
-  // 전체 연도별 목표 요약 렌더
-  renderGoalSummary();
-}
-function renderGoalSummary(){
-  const wrap=document.getElementById('goal-all-summary');
-  if(!wrap) return;
-  const all=loadAllGoals();
-  const years=Object.keys(all).map(Number).sort();
-  if(years.length===0){wrap.innerHTML='';return;}
-  wrap.innerHTML=years.map(y=>{
-    const g=all[y];
-    const goalStr=g.usd>0?'$'+g.usd.toLocaleString('en-US'):g.krw>0?(g.krw>=10000?Math.round(g.krw/10000)+'만원':g.krw.toLocaleString()+'원'):'—';
-    const isActive=y===currentYear;
-    return `<div onclick="switchGoalYear(${y})" style="cursor:pointer;padding:6px 14px;border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;font-weight:700;border:1.5px solid ${isActive?'var(--accent)':'var(--border2)'};background:${isActive?'var(--accent-dim)':'transparent'};color:${isActive?'var(--accent)':'var(--text-muted)'};transition:all .15s;">${y}년<br><span style="font-size:12px;font-weight:400;">${goalStr}</span></div>`;
-  }).join('');
-}
-function switchGoalYear(y){
-  // 연도 전환 (setYear 활용)
-  setYear(y, document.querySelector('.year-btn[onclick*="'+y+'"]'));
-  initGoalInputs();
+  if(g.usd) document.getElementById('goal-usd').value=g.usd;
+  if(g.krw) document.getElementById('goal-krw').value=g.krw;
 }
 function updateAchieve(){
   const g=loadGoal();
   const d=DIVIDENDS[currentYear]||[];
-  const totalKrw=d.filter(v=>v!==null&&v>0).reduce((s,v)=>s+v,0);
+  const total=d.filter(v=>v!==null&&v>0).reduce((s,v)=>s+v,0);
 
-  const wrap=document.getElementById('div-achieve-wrap');
-  if(!wrap) return;
-
-  // ── USD 목표: 실적도 USD 기준으로 비교 ──────────────────
-  if(g.usd>0 && g.krw===0){
-    // 실적 USD 산출
-    let totalUsd=0;
-    if(currentYear===2026){
-      if(SD.div2026Usd!=null && SD.div2026Usd>0){
-        totalUsd=SD.div2026Usd;
-      } else if(SD.div2026MonthlyUsd){
-        totalUsd=SD.div2026MonthlyUsd.filter(v=>v!=null&&v>0).reduce((s,v)=>s+v,0);
-      } else {
-        totalUsd=totalKrw>0?Math.round(totalKrw/SD.fxRate):0;
-      }
-    } else if(currentYear===2025){
-      if(SD.div2025MonthlyUsd){
-        totalUsd=SD.div2025MonthlyUsd.filter(v=>v!=null&&v>0).reduce((s,v)=>s+v,0);
-      } else {
-        totalUsd=totalKrw>0?Math.round(totalKrw/SD.fxRate):0;
-      }
-    }
-    const goalUsd=g.usd;
-    if(!goalUsd||!totalUsd){wrap.style.display='none';return;}
-    wrap.style.display='block';
-
-    const pct=Math.min(Math.round(totalUsd/goalUsd*1000)/10,999);
-    const barW=Math.min(pct,100);
-    const isDone=pct>=100;
-
-    document.getElementById('div-achieve-pct').textContent=pct.toFixed(1)+'%';
-    document.getElementById('div-achieve-pct').style.color=isDone?'var(--green)':'var(--accent)';
-    const bar=document.getElementById('div-achieve-bar');
-    bar.style.width=barW+'%';
-    bar.className='div-achieve-bar'+(isDone?' done':'');
-
-    const remain=goalUsd-totalUsd;
-    const goalDisp='$'+goalUsd.toLocaleString('en-US');
-    const remDisp=remain>0?'$'+Math.round(remain).toLocaleString('en-US'):'달성!';
-    const totalDisp='$'+Math.round(totalUsd).toLocaleString('en-US');
-    let detailStr=totalDisp+' / 목표 '+goalDisp;
-    if(!isDone) detailStr+=' · 잔여 '+remDisp;
-    else detailStr+=' 🎉';
-    document.getElementById('div-achieve-detail').textContent=detailStr;
-    return;
-  }
-
-  // ── 원화 목표: 기존 원화 비교 ────────────────────────────
-  const total=totalKrw;
+  // 목표를 원화로 통일
   let goalKrw=0;
   if(g.krw>0) goalKrw=g.krw;
   else if(g.usd>0) goalKrw=Math.round(g.usd*SD.fxRate);
 
+  const wrap=document.getElementById('div-achieve-wrap');
+  if(!wrap) return;
+
   if(!goalKrw||!total){wrap.style.display='none';return;}
   wrap.style.display='block';
 
-  const pct=Math.min(Math.round(total/goalKrw*1000)/10,999);
+  const pct=Math.min(Math.round(total/goalKrw*100),999);
   const barW=Math.min(pct,100);
   const isDone=pct>=100;
 
-  document.getElementById('div-achieve-pct').textContent=pct.toFixed(1)+'%';
+  document.getElementById('div-achieve-pct').textContent=pct+'%';
   document.getElementById('div-achieve-pct').style.color=isDone?'var(--green)':'var(--accent)';
+
   const bar=document.getElementById('div-achieve-bar');
   bar.style.width=barW+'%';
   bar.className='div-achieve-bar'+(isDone?' done':'');
@@ -2188,12 +2060,13 @@ function updateAchieve(){
   const remDisp=remain>0?(remain>=10000?Math.round(remain/10000)+'만원':remain.toLocaleString()+'원'):'달성!';
   const totalDisp=total>=10000?Math.round(total/10000)+'만원':total.toLocaleString()+'원';
 
+  // 달러 목표인 경우 달러도 표시
   let detailStr=totalDisp+' / 목표 '+goalDisp;
+  if(g.usd>0&&g.krw===0) detailStr+=' ($'+g.usd.toLocaleString()+')';
   if(!isDone) detailStr+=' · 잔여 '+remDisp;
   else detailStr+=' 🎉';
   document.getElementById('div-achieve-detail').textContent=detailStr;
 }
-
 
 function renderDividend(){
   const d=DIVIDENDS[currentYear]||[];
@@ -2239,17 +2112,15 @@ function renderDividend(){
     })();
     const usdM=usdNum?'<span class="m-amt-usd">$'+usdNum.toLocaleString('en-US')+'</span>':'';
     const col=document.createElement('div');col.className='m-col';
-    const isPeak=(ok&&i===peakI);
-    col.innerHTML=`<div class="m-amt">${ok?'<span>'+fmtK(amt)+'</span>':''}${usdM}</div><div class="m-bar-wrap"><div class="m-bar${isPeak?' peak':isCur?' current':ok?'':' empty'}" style="height:${hp}%"></div></div><div class="m-label">${i+1}</div>`;
+    col.innerHTML=`<div class="m-amt">${ok?'<span>'+fmtK(amt)+'</span>':''}${usdM}</div><div class="m-bar-wrap"><div class="m-bar${isCur?' current':ok?'':' empty'}" style="height:${hp}%"></div></div><div class="m-label">${i+1}</div>`;
     bars.appendChild(col);
   });
   const body=document.getElementById('div-tbl-body');body.innerHTML='';
   const all=Object.values(DIVIDENDS).flat().filter(Boolean);const gMax=Math.max(...all);
   [2025,2026].forEach(y=>{
     const row=document.createElement('div');row.className='st-row';const rd=DIVIDENDS[y]||[];
-    const yMax=Math.max(...rd.map(v=>v||0));
     let cells=`<div style="font-weight:700;font-size:14px;color:${y===currentYear?'var(--accent)':'var(--text-sub)'}">${y}</div>`;
-    rd.forEach((v,ci)=>{const isM=v&&v===gMax;const isYearPeak=v&&v===yMax&&yMax>0;const isCur=y===currentYear&&v;
+    rd.forEach((v,ci)=>{const isM=v&&v===gMax;const isCur=y===currentYear&&v;
       const usdC=(()=>{
         if(!v)return'';
         let n=null;
@@ -2261,13 +2132,11 @@ function renderDividend(){
         }
         return n>0?'<span style="display:block;font-size:11px;color:#38bdf8;opacity:.85;margin-top:1px;">$'+n.toLocaleString('en-US')+'</span>':'';
       })();
-      cells+=`<div class="st-cell${isM?' hi':isCur?' now':''}" style="${isYearPeak?'font-size:13px;font-weight:800;color:var(--gold);':''}">${v?fmtK(v):'—'}${usdC}</div>`;});
+      cells+=`<div class="st-cell${isM?' hi':isCur?' now':''}">${v?fmtK(v):'—'}${usdC}</div>`;});
     row.innerHTML=cells;body.appendChild(row);
   });
   // 달성률 업데이트
   updateAchieve();
-  // 목표 입력창 연도 동기화
-  initGoalInputs();
 }
 
 // ══════════════════════════════════════════
@@ -2438,8 +2307,6 @@ function updateHmDateLabels(){
   });
   const ko=document.getElementById('hm-date-kospi');
   if(ko) ko.textContent = koLabel;
-  const kodaq=document.getElementById('hm-date-kosdaq');
-  if(kodaq) kodaq.textContent = koLabel;
 }
 
 // ══ 주요 지수 ══
@@ -2657,13 +2524,13 @@ function getHmCacheKey(){
 }
 function applyHmCacheBuster(){
   const v=getHmCacheKey();
-  ['sp500','nasdaq','kospi','kosdaq','russell'].forEach(function(t){
+  ['sp500','nasdaq','kospi','russell'].forEach(function(t){
     const img=document.getElementById('hm-img-'+t+'-img');
     if(img&&img.dataset.src) img.src=img.dataset.src+'?v='+v;
   });
   updateHmDateLabels();
 }
-function switchHeatmap(type){activeHm=type;['sp500','nasdaq','kospi','kosdaq','russell'].forEach(t=>{const w=document.getElementById('hm-'+t);if(w)w.style.display=t===type?'block':'none';document.getElementById('htab-'+t)?.classList.toggle('active',t===type);});initHeatmap(type);applyHmCacheBuster();}
+function switchHeatmap(type){activeHm=type;['sp500','nasdaq','kospi','russell'].forEach(t=>{const w=document.getElementById('hm-'+t);if(w)w.style.display=t===type?'block':'none';document.getElementById('htab-'+t)?.classList.toggle('active',t===type);});initHeatmap(type);applyHmCacheBuster();}
 function initHeatmap(type){if(hmInit[type])return;hmInit[type]=true;const iframe=document.getElementById('iframe-'+type);if(iframe){iframe.src=HM_URLS[type];setTimeout(()=>hmCheck(type),5000);}}
 function hmLoaded(type){try{document.getElementById('iframe-'+type)?.contentDocument;document.getElementById('hm-'+type+'-loading').style.display='none';}catch(e){if(e.name==='SecurityError')document.getElementById('hm-'+type+'-loading').style.display='none';else hmError(type);}}
 function hmError(type){document.getElementById('hm-'+type+'-loading').style.display='none';const iframe=document.getElementById('iframe-'+type);if(iframe)iframe.style.display='none';document.getElementById('hm-'+type+'-blocked')?.classList.add('show');}
@@ -2717,10 +2584,10 @@ function switchHoldings(type,el){
 function setYear(y,btn){
   currentYear=y;
   document.querySelectorAll('.year-btn').forEach(b=>b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
+  btn.classList.add('active');
   updateCards();
   if(currentPage==='trend')renderTrend();
-  if(currentPage==='dividend'){renderDividend();initGoalInputs();}
+  if(currentPage==='dividend')renderDividend();
 }
 function setPeriod(p){
   currentPeriod=p;
