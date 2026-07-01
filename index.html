@@ -73,6 +73,13 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .period-tab:hover{color:var(--text-sub);}
 .period-tab.active{background:var(--surface);color:var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.4);}
 
+/* MONTH SUBTABS (일별 탭 전용) */
+.month-subtabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 4px;}
+.month-subtab{padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border);transition:all .14s;font-family:'DM Mono',monospace;}
+.month-subtab:hover{color:var(--text-sub);border-color:var(--border2);}
+.month-subtab.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(56,189,248,.35);}
+.month-subtab.empty{opacity:.35;cursor:not-allowed;}
+
 /* STATUS BAR */
 .status-bar{display:flex;align-items:center;gap:8px;padding:9px 16px;background:var(--surface2);border-radius:8px;margin:10px 0;font-size:14px;}
 .s-ok{color:var(--green);}.s-err{color:var(--red);}.s-loading{color:var(--accent);}
@@ -550,6 +557,10 @@ td.td-month{text-align:right;color:var(--text-sub);font-size:13px;}
       <button class="refresh-btn" style="padding:4px 11px;" onclick="fetchAndStoreDailyEntry()">오늘 저장</button>
     </div>
 
+    <!-- 일별 탭 전용: 월 선택 서브탭 -->
+    <div class="month-subtabs" id="month-subtabs" style="display:none;">
+    </div>
+
     <!-- 카드 -->
     <div class="cards-top">
       <div class="card total card-total-row card-on" id="card-total" onclick="toggleSeries('total')">
@@ -854,6 +865,7 @@ function getFinanceUrl(name){
 }
 
 let currentYear=2026,currentPage='trend',currentPeriod='daily';
+let dailyViewMonth=(new Date(Date.now()+9*3600*1000)).getMonth()+1; // 일별 탭에서 보고 있는 월(1~12), 기본=현재월
 let trendChart=null,holdingsPage='all';
 const SD={
   total:null,san:null,nae:null,boy:null,info:null,
@@ -952,8 +964,8 @@ async function loadAllSheetData(){
     fetchPub(GID_2025,'W83:W94'),   // [7] 산이 2025 (25.1~25.12, 12값)
     // ★ 2026 월별 (GID_FAM)
     fetchPub(GID_FAM,'O9:O21'),  // [8] 내계좌 2026 (13값)
-    fetchPub(GID_FAM,'O27:O39'),  // [9] 보연씌 2026 (13값)
-    fetchPub(GID_FAM,'O43:O55'),  // [10] 산이 2026 (13값)
+    fetchPub(GID_FAM,'O25:O37'),  // [9] 보연씌 2026 (13값)
+    fetchPub(GID_FAM,'O41:O53'),  // [10] 산이 2026 (13값)
     // ★ 2026 배당 (GID_2026)
     fetchPub(GID_2026,'L60:W60'), // [11] 2026 월별 배당합계 (12개)
     fetchPub(GID_2026,'L8:W8'),   // [12] 산이: NVDW 월별배당
@@ -1353,9 +1365,30 @@ function updateCards(){
     // mon 배열: [0]=전년12월말, [1]=1월말, [2]=2월말 ...
     // 현재 5월(getMonth=4) → 전월말=4월 → mon[4] ✅
     const mIdx=getKST().getMonth(); // KST 기준 월(0-indexed)
-    sanP=mon.san?.[mIdx]??null;
-    naeP=mon.nae?.[mIdx]??null;
-    boyP=mon.boy?.[mIdx]??null;
+    // ✅ 시트(GID_FAM O열) 값이 아직 입력되지 않아 null인 경우,
+    //    0번 인덱스까지 역순으로 탐색해 가장 최근에 채워진 값으로 대체
+    const findLatest=(arr)=>{
+      if(!arr)return null;
+      for(let i=mIdx;i>=0;i--){ if(arr[i]!=null) return arr[i]; }
+      return null;
+    };
+    sanP=findLatest(mon.san);
+    naeP=findLatest(mon.nae);
+    boyP=findLatest(mon.boy);
+    // ✅ 2차 폴백: GID_FAM O열 자체가 계좌 전체 null(행 오프셋 문제 등)일 때는
+    //    일별 로그(GID_LOG)에서 "이번 달 1일 이전의 마지막 기록"을 전월말 값으로 사용
+    //    → 산이/보연 계좌가 GID_FAM에 값이 안 잡혀도 일별 데이터로 전월대비 계산 가능
+    if(sanP==null||naeP==null||boyP==null){
+      const dailyEntries=loadDailyEntries();
+      const firstOfMonth=kstDate().slice(0,7)+'-01';
+      const prevEntries=dailyEntries.filter(e=>e.date<firstOfMonth);
+      const lastPrev=prevEntries.length?prevEntries[prevEntries.length-1]:null;
+      if(lastPrev){
+        if(sanP==null)sanP=lastPrev.san??null;
+        if(naeP==null)naeP=lastPrev.nae??null;
+        if(boyP==null)boyP=lastPrev.boy??null;
+      }
+    }
   }else{
     // ✅ 연도별: 전년(2025) 12월 말 기준 = SD.mon2025의 마지막([12]=25년12월말)
     // GID_FAM O9:O21의 [0]은 25.12말이 아닌 다른 값이므로 mon2025 마지막값 사용
@@ -1702,11 +1735,17 @@ function renderTrend(){
     setEl('chart-title','연도별 자산 추이 (월말 기준)');
 
   }else if(currentPeriod==='daily'){
-    const entries=loadDailyEntries();
-    if(!entries.length){drawEmptyChart('「오늘 저장」 버튼으로 첫 데이터를 추가하세요');return;}
+    const allEntries=loadDailyEntries();
+    if(!allEntries.length){drawEmptyChart('「오늘 저장」 버튼으로 첫 데이터를 추가하세요');return;}
+    // ✅ 매월 1일부터 새 그래프: 선택된 월(dailyViewMonth)의 데이터만 표시
+    //    dailyViewMonth 는 상단 1월~12월 서브탭에서 선택 (기본=이번 달)
+    renderMonthSubtabs(allEntries);
+    const mm=String(dailyViewMonth).padStart(2,'0');
+    const entries=allEntries.filter(e=>e.date.slice(5,7)===mm);
+    if(!entries.length){drawEmptyChart(dailyViewMonth+'월 데이터가 아직 없습니다');return;}
     labels=entries.map(e=>{ const p=e.date.slice(5).split('-'); return parseInt(p[0])+'.'+p[1]; });
     sanArr=entries.map(e=>e.san);naeArr=entries.map(e=>e.nae);boyArr=entries.map(e=>e.boy);
-    setEl('chart-title','일별 자산 변화');
+    setEl('chart-title',dailyViewMonth+'월 일별 자산 변화');
 
   }else{
     // ── 월별: x축 = 1월~12월(해당 연도 고정), 하드코딩 월말 + 실제 일별 합산
@@ -2593,8 +2632,29 @@ function setPeriod(p){
   currentPeriod=p;
   ['daily','monthly','yearly'].forEach(x=>document.getElementById('pt-'+x).classList.toggle('active',x===p));
   document.getElementById('year-btns').style.display=p==='yearly'?'none':'flex';
+  document.getElementById('month-subtabs').style.display=p==='daily'?'flex':'none';
   updateCards();
   renderTrend();
+}
+
+// ✅ 일별 탭 상단 1~12월 서브탭: 클릭 시 해당 월의 일별 데이터만 새로 그림
+function setDailyMonth(m){
+  dailyViewMonth=m;
+  renderTrend();
+}
+
+// ✅ 실제 데이터가 있는 월만 활성화, 나머지는 흐리게(비활성) 표시
+function renderMonthSubtabs(allEntries){
+  const wrap=document.getElementById('month-subtabs');
+  if(!wrap)return;
+  const monthsWithData=new Set(allEntries.map(e=>parseInt(e.date.slice(5,7))));
+  let html='';
+  for(let m=1;m<=12;m++){
+    const hasData=monthsWithData.has(m);
+    const cls='month-subtab'+(m===dailyViewMonth?' active':'')+(hasData?'':' empty');
+    html+=`<div class="${cls}" onclick="${hasData?`setDailyMonth(${m})`:''}">${m}월</div>`;
+  }
+  wrap.innerHTML=html;
 }
 
 // ══════════════════════════════════════════
