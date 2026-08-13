@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>산이네 자산관리 v129</title>
+<title>산이네 자산관리 v131</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=DM+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -1347,66 +1347,79 @@ async function loadAllSheetData(){
 //  카드
 // ══════════════════════════════════════════
 function updateCards(){
+  // 1. 탭 전환 시 이전 텍스트 찌꺼기 초기화
+  setChg('total-change', {text:'', cls:'neutral'});
+  setChg('san-change', {text:'', cls:'neutral'});
+  setChg('nae-change', {text:'', cls:'neutral'});
+  setChg('boy-change', {text:'', cls:'neutral'});
+
   setEl('total-val',fmtCard(SD.total));
   setEl('san-val',fmtCard(SD.san));
   setEl('nae-val',fmtCard(SD.nae));
   setEl('boy-val',fmtCard(SD.boy));
 
-  const mon=currentYear===2026?SD.mon2026:SD.mon2025;
-  let sanP=null,naeP=null,boyP=null;
+  const mon = currentYear === 2026 ? SD.mon2026 : SD.mon2025;
+  let sanP = null, naeP = null, boyP = null;
 
-  if(currentPeriod==='daily'){
-    const entries=loadDailyEntries();
-    const today=kstDate();
-    const prev=entries.filter(e=>e.date<today).slice(-1)[0]||null;
-    if(prev){sanP=prev.san;naeP=prev.nae;boyP=prev.boy;}
-  }else if(currentPeriod==='monthly'){
-    // ✅ KST 기준 현재 월로 전월 말 인덱스 계산
-    // mon 배열: [0]=전년12월말, [1]=1월말, [2]=2월말 ...
-    // 현재 5월(getMonth=4) → 전월말=4월 → mon[4] ✅
-    const mIdx=getKST().getMonth(); // KST 기준 월(0-indexed)
-    // ✅ 시트(GID_FAM O열) 값이 아직 입력되지 않아 null인 경우,
-    //    0번 인덱스까지 역순으로 탐색해 가장 최근에 채워진 값으로 대체
-    const findLatest=(arr)=>{
-      if(!arr)return null;
-      for(let i=mIdx;i>=0;i--){ if(arr[i]!=null) return arr[i]; }
-      return null;
-    };
-    sanP=findLatest(mon.san);
-    naeP=findLatest(mon.nae);
-    boyP=findLatest(mon.boy);
-    // ✅ 2차 폴백: GID_FAM O열 자체가 계좌 전체 null(행 오프셋 문제 등)일 때는
-    //    일별 로그(GID_LOG)에서 "이번 달 1일 이전의 마지막 기록"을 전월말 값으로 사용
-    //    → 산이/보연 계좌가 GID_FAM에 값이 안 잡혀도 일별 데이터로 전월대비 계산 가능
-    if(sanP==null||naeP==null||boyP==null){
-      const dailyEntries=loadDailyEntries();
-      const firstOfMonth=kstDate().slice(0,7)+'-01';
-      const prevEntries=dailyEntries.filter(e=>e.date<firstOfMonth);
-      const lastPrev=prevEntries.length?prevEntries[prevEntries.length-1]:null;
+  if(currentPeriod === 'daily'){
+    const entries = loadDailyEntries();
+    const today = kstDate();
+    const prev = entries.filter(e => e.date < today).slice(-1)[0] || null;
+    if(prev){ sanP = prev.san; naeP = prev.nae; boyP = prev.boy; }
+  } else if(currentPeriod === 'monthly'){
+    // 월별: 전월 말일 기준
+    const mIdx = getKST().getMonth(); // 8월이면 7 (0-indexed)
+    
+    // 1순위: 시트의 정확히 '전월 말일(7월)' 데이터 확인
+    sanP = (mon.san && mon.san[mIdx] > 0) ? mon.san[mIdx] : null;
+    naeP = (mon.nae && mon.nae[mIdx] > 0) ? mon.nae[mIdx] : null;
+    boyP = (mon.boy && mon.boy[mIdx] > 0) ? mon.boy[mIdx] : null;
+
+    // 2순위: 시트 데이터가 없다면(0), '일별 기록'에서 7월 31일(이번 달 1일 이전 마지막) 데이터 가져오기
+    if(sanP == null || naeP == null || boyP == null){
+      const dailyEntries = loadDailyEntries();
+      const firstOfMonth = kstDate().slice(0,7) + '-01'; // 예: '2026-08-01'
+      const prevEntries = dailyEntries.filter(e => e.date < firstOfMonth);
+      const lastPrev = prevEntries.length ? prevEntries[prevEntries.length-1] : null;
+      
       if(lastPrev){
-        if(sanP==null)sanP=lastPrev.san??null;
-        if(naeP==null)naeP=lastPrev.nae??null;
-        if(boyP==null)boyP=lastPrev.boy??null;
+        if(sanP == null && lastPrev.san > 0) sanP = lastPrev.san;
+        if(naeP == null && lastPrev.nae > 0) naeP = lastPrev.nae;
+        if(boyP == null && lastPrev.boy > 0) boyP = lastPrev.boy;
       }
     }
-  }else{
-    // ✅ 연도별: 전년(2025) 12월 말 기준 = SD.mon2025의 마지막([12]=25년12월말)
-    // GID_FAM O9:O21의 [0]은 25.12말이 아닌 다른 값이므로 mon2025 마지막값 사용
+
+    // 3순위: 일별 기록조차 없다면, 시트에서 더 이전 달(6월, 5월...)로 역순 탐색
+    const findOlder = (arr) => {
+      if(!arr) return null;
+      for(let i = mIdx - 1; i >= 0; i--){ if(arr[i] != null && arr[i] > 0) return arr[i]; }
+      return null;
+    };
+    if(sanP == null) sanP = findOlder(mon.san);
+    if(naeP == null) naeP = findOlder(mon.nae);
+    if(boyP == null) boyP = findOlder(mon.boy);
+
+  } else {
+    // 연도별: 전년도 말일 기준
     const prevMon = SD.mon2025 || {};
-    sanP = prevMon.san?.[12] ?? null;
-    naeP = prevMon.nae?.[12] ?? null;
-    boyP = prevMon.boy?.[12] ?? null;
+    sanP = (prevMon.san && prevMon.san[12] > 0) ? prevMon.san[12] : null;
+    naeP = (prevMon.nae && prevMon.nae[12] > 0) ? prevMon.nae[12] : null;
+    boyP = (prevMon.boy && prevMon.boy[12] > 0) ? prevMon.boy[12] : null;
   }
 
-  if(SD.san!=null&&sanP!=null)setChg('san-change',fmtChg(SD.san,sanP));
-  if(SD.nae!=null&&naeP!=null)setChg('nae-change',fmtChg(SD.nae,naeP));
-  if(SD.boy!=null&&boyP!=null)setChg('boy-change',fmtChg(SD.boy,boyP));
-  // ✅ totalP: null인 계좌는 현재값으로 대체 (분모 왜곡 방지)
-  // null이면 해당 계좌는 변동 없음(현재값=이전값)으로 가정하여 합산
-  const totalP = (sanP!=null?sanP:(SD.san||0))
-               + (naeP!=null?naeP:(SD.nae||0))
-               + (boyP!=null?boyP:(SD.boy||0));
-  if(SD.total!=null&&totalP>0)setChg('total-change',fmtChg(SD.total,totalP));
+  // 개별 계좌 증감 계산
+  if(SD.san != null && sanP != null) setChg('san-change', fmtChg(SD.san, sanP));
+  if(SD.nae != null && naeP != null) setChg('nae-change', fmtChg(SD.nae, naeP));
+  if(SD.boy != null && boyP != null) setChg('boy-change', fmtChg(SD.boy, boyP));
+
+  // 총자산 증감 계산
+  const totalP = (sanP != null ? sanP : (SD.san || 0))
+               + (naeP != null ? naeP : (SD.nae || 0))
+               + (boyP != null ? boyP : (SD.boy || 0));
+  
+  if(SD.total != null && totalP > 0 && (sanP != null || naeP != null || boyP != null)){
+    setChg('total-change', fmtChg(SD.total, totalP));
+  }
 }
 
 // ══════════════════════════════════════════
