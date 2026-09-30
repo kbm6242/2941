@@ -1085,11 +1085,17 @@ async function loadAllSheetData(){
     });
     return items;
   };
-  const newHoldings = ACC_DEF.map(def => {
+const newHoldings = ACC_DEF.map(def => {
     const res  = results[def.idx];
     const tres = results[def.tidx];
     const items = (res&&res.status==='fulfilled') ? parseItems(parseCSV(res.value)) : [];
-    const total = (tres&&tres.status==='fulfilled') ? parseSingle(tres.value) : null;
+    let total = (tres&&tres.status==='fulfilled') ? parseSingle(tres.value) : null;
+    
+    // ▼ [안전장치] 시트의 합계 셀이 지워졌거나 에러가 났을 경우, 개별 평가금액을 자동 합산합니다.
+    if (total === null || total === 0) {
+      total = items.reduce((sum, item) => sum + (toNum(item.val) || 0), 0);
+    }
+    
     return {acc:def.acc, num:def.num, color:def.color, total, items};
   }).filter(a => a.items.length > 0);
 
