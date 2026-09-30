@@ -1015,6 +1015,8 @@ async function loadAllSheetData(){
     fetchPub(GID_2026,'L50:W50'),      // [54] 내계좌: CHPY 월별배당
     fetchPub(GID_2026,'L40:W40'),      // [55] 증여예정: 버티브홀딩스 월별배당
     fetchPub(GID_2026,'L12:W12'),     // [56] 산이: TIGER 미국배당 다우존스
+    fetchPub(GID_2026,'L44:W44'),     // [57] 현대차
+
   ]);
 
   let ok=0;
@@ -1211,11 +1213,7 @@ async function loadAllSheetData(){
 
   const newDivData = [
     {acc:'내계좌', color:'#a78bfa',
-     items: [
-       ...parseDivItems(results[50],[results[23]],jFullArr,[36]),
-       ...parseDivItems(results[56],[results[24]],jFullArr,[38]),
-       ...parseDivItems(results[57],[results[54]],jFullArr,[40]),
-     ]},
+     items: parseDivItems(results[50],[null, null, results[23],results[24],results[54]],jFullArr,[34,36,38,40,42])},
     {acc:'증여예정', color:'#a78bfa',
      items: parseDivItems(results[49],[results[20],results[21],results[22],results[55]],jFullArr,[24,26,28,30])},
     {acc:'연금계좌', color:'#a78bfa',
@@ -1284,25 +1282,28 @@ async function loadAllSheetData(){
   // 종목별 월별 배당 파싱
   // 시트 행 순서 ↔ HOLDINGS_DIV 종목 순서 1:1 매핑
   const divRowMap=[
-    {acc:'산이계좌',   idx:12},  // L8:W8   → 엔비디아(직접)
-    {acc:'산이계좌',   idx:13},  // L10:W10 → NVDW
-    {acc:'산이계좌',   idx:56},  // TIGER 미국배당 다우존스(추가)
-    {acc:'보연씌계좌', idx:14},  // L16:W16 → AMDW
-    {acc:'보연씌계좌', idx:15},  // L18:W18 → METW
-    {acc:'보연씌계좌', idx:16},  // L20:W20 → CHPY
-    {acc:'보연씌계좌', idx:17},  // L22:W22 → PLTW
-    {acc:'보연씌계좌', idx:18},  // L24:W24 → GOOW
-    {acc:'보연씌계좌', idx:19},  // L26:W26 → 6번째
-    {acc:'증여예정',   idx:20},  // L32:W32 → 엔비디아
-    {acc:'증여예정',   idx:21},  // L34:W34 → NVDW
-    {acc:'증여예정',   idx:22},  // L36:W36 → 테라다인
-    {acc:'증여예정',   idx:55},  // L38:W38 → 버티브홀딩스 (신규)
-    {acc:'내계좌',     idx:23},  // L44:W44 → TSLW
-    {acc:'내계좌',     idx:24},  // L46:W46 → GOOW
-    {acc:'내계좌',     idx:54},  // L48:W48 → CHPY (신규)
-    {acc:'연금계좌',   idx:25},  // L50:W50 → 미국배당커버드콜
-    {acc:'연금계좌',   idx:26},  // L52:W52 → TOP10
-    {acc:'연금계좌',   idx:27},  // L54:W54 → 나스닥100
+    {acc:'산이계좌',   idx:12},
+    {acc:'산이계좌',   idx:13},
+    {acc:'산이계좌',   idx:56},
+    {acc:'보연씌계좌', idx:14},
+    {acc:'보연씌계좌', idx:15},
+    {acc:'보연씌계좌', idx:16},
+    {acc:'보연씌계좌', idx:17},
+    {acc:'보연씌계좌', idx:18},
+    {acc:'보연씌계좌', idx:19},
+    {acc:'증여예정',   idx:20},
+    {acc:'증여예정',   idx:21},
+    {acc:'증여예정',   idx:22},
+    {acc:'증여예정',   idx:55},
+    // ▼ 내계좌 5종목 순서대로 1:1 매핑 (배당 없는 종목은 null)
+    {acc:'내계좌',     idx:null}, // 1. 우주데이터 
+    {acc:'내계좌',     idx:57}, // 2. 현대차
+    {acc:'내계좌',     idx:23},   // 3. TSLW
+    {acc:'내계좌',     idx:24},   // 4. GOOW
+    {acc:'내계좌',     idx:54},   // 5. CHPY
+    {acc:'연금계좌',   idx:25},
+    {acc:'연금계좌',   idx:26},
+    {acc:'연금계좌',   idx:27},
   ];
 
   // HOLDINGS_DIV의 m 배열을 시트 데이터로 업데이트
@@ -1314,10 +1315,10 @@ async function loadAllSheetData(){
   // 계좌별 종목 순서대로 매핑
   const accItemIdx={};
   divRowMap.forEach(function(row){
-    const months=parseRow(results[row.idx]);
-    // 현재까지 데이터 있는 월만 (null 아닌 것)
-    const mArr=months.slice(0,12);
-    // HOLDINGS_DIV에서 해당 계좌의 다음 종목에 배정
+    // ▼ idx가 null일 때 안전하게 넘어가도록 수정된 부분
+    const months = (row.idx === null) ? Array(12).fill(null) : parseRow(results[row.idx]);
+    const mArr = months.slice(0,12);
+
     if(!accItemIdx[row.acc]) accItemIdx[row.acc]=0;
     for(var si=0;si<HOLDINGS_DIV.length;si++){
       const sec=HOLDINGS_DIV[si];
@@ -1338,7 +1339,6 @@ async function loadAllSheetData(){
       }
     }
   });
-
   renderMarketIndex();
   updateCards();renderTrend();renderInfoTable();
   renderHoldingsAll();
