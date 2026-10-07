@@ -987,7 +987,7 @@ async function loadAllSheetData(){
     fetchPub(GID_2026,'L54:W54'), // [26] 연금: TOP10
     fetchPub(GID_2026,'L56:W56'), // [27] 연금: 나스닥100
     fetchPub(GID_2026,'J8:J56'),  // [28] J열 전체 (연배당금액)
-    fetchPub(GID_LOG,'A2:F500'),    // [29] 일별자산기록 전체
+    fetchPub(GID_LOG,'A2:I500'),    // [29] 일별자산기록 전체
     fetchPub(GID_FAM,'R6'),           // [30] 총 매입원금
     fetchPub(GID_LOG,'L2:M10'),        // [31] 주요지수 fallback용 (실시간은 SCRIPT_URL)
     fetchPub(GID_FAM,'C8:I22'),        // [32] 내계좌 종목
@@ -1134,7 +1134,18 @@ const newHoldings = ACC_DEF.map(def => {
       }catch(e){}
       if(!dateStr)return;
       const toN=v=>{const n=parseFloat(String(v).replace(/[^0-9.-]/g,''));return isNaN(n)?null:n;};
-      SD.dailyLog.push({date:dateStr,total:toN(r[1]),nae:toN(r[2]),boy:toN(r[3]),san:toN(r[4]),buy:toN(r[5])});
+      SD.dailyLog.push({
+        date:dateStr,
+        total:toN(r[1]),
+        nae:toN(r[2]),
+        boy:toN(r[3]),
+        san:toN(r[4]),
+        buy:toN(r[5]),
+        // ▼ G, H, I열의 개별 계좌 원금 데이터를 추가로 저장합니다.
+        naeBuy:toN(r[6]),
+        boyBuy:toN(r[7]),
+        sanBuy:toN(r[8])
+      });
     });
     if(SD.dailyLog.length>0)ok++;
   }
@@ -1815,62 +1826,51 @@ function renderTrend(){
     return sv+nv+bv;
   });
 
-  // 원금(buy) 라인
-  let buyArr;
-  const fixBuy=calcTotalBuy()||null;
-  if(currentPeriod==='daily'){
-    const allE=loadDailyEntries();
-    if(allE.length>=2&&allE.some(e=>e.buy)){
-      buyArr=allE.map(e=>e.buy||null);
-    }else{
-      buyArr=labels.map(()=>fixBuy);
+// ── 원금 라인 동적 생성 (일별 데이터가 있으면 환율 변동을 차트에 반영) ──
+  const fixBuy = calcTotalBuy() || null;
+  const getDynamicLine = (key, staticVal) => {
+    if (currentPeriod === 'daily') {
+      const allE = loadDailyEntries();
+      if (allE.length >= 2 && allE.some(e => e[key])) {
+        return allE.map(e => e[key] || null);
+      }
+      return labels.map(() => staticVal);
+    } else if (currentPeriod === 'yearly') {
+      const liveBuyEntries = loadDailyEntries().filter(e => e.date >= '2026-04-01');
+      const mbMap = {};
+      liveBuyEntries.forEach(e => { const ym = e.date.slice(0, 7); mbMap[ym] = e; });
+      if (Object.keys(mbMap).length > 0 && liveBuyEntries.some(e => e[key])) {
+        return labels.map(lbl => {
+          const parts = lbl.split('.');
+          if (parts.length < 2) return staticVal;
+          let yr = parseInt(parts[0]); if (yr < 100) yr += 2000;
+          const mn = parseInt(parts[1]);
+          const ym = yr + '-' + String(mn).padStart(2, '0');
+          return mbMap[ym] && mbMap[ym][key] ? mbMap[ym][key] : staticVal;
+        });
+      }
+      return labels.map(() => staticVal);
+    } else {
+      // monthly
+      const cutoff2 = currentYear === 2026 ? String(currentYear) + '-04-21' : String(currentYear) + '-01-01';
+      const filtered = loadDailyEntries().filter(e => e.date.startsWith(String(currentYear)) && e.date >= cutoff2);
+      if (filtered.length > 0 && filtered.some(e => e[key])) {
+        const map = {};
+        filtered.forEach(e => { 
+          const p = e.date.slice(5).split('-');
+          const lblKey = parseInt(p[0]) + '.' + p[1];
+          map[lblKey] = e[key] || null; 
+        });
+        return labels.map(lbl => map[lbl] ? map[lbl] : staticVal);
+      }
+      return labels.map(() => staticVal);
     }
-  }else if(currentPeriod==='yearly'){
-    // 연별: merged 포인트에서 buy 값
-    const hard2025b = getHardcodedMonthEnd(2025).map(()=>null); // 하드코딩엔 buy 없음
-    const liveBuyEntries = loadDailyEntries().filter(e=>e.date>='2026-04-01');
-    const mbMap={};
-    liveBuyEntries.forEach(e=>{ const ym=e.date.slice(0,7); mbMap[ym]=e; });
-    const sortedYMs=Object.keys(mbMap).sort();
-    if(sortedYMs.length>0&&liveBuyEntries.some(e=>e.buy)){
-      // labels 기준으로 buy 맵핑
-      buyArr=labels.map(lbl=>{
-        const parts=lbl.split('.');
-        let yr=parseInt(parts[0]); if(yr<100)yr+=2000;
-        const mn=parseInt(parts[1]);
-        const ym=yr+'-'+String(mn).padStart(2,'0');
-        return mbMap[ym]?mbMap[ym].buy||null:null;
-      });
-    }else{
-      buyArr=labels.map(()=>fixBuy);
-    }
-  }else{
-    // 월별: 실제 entries buy 사용
-    const cutoff2=currentYear===2026?String(currentYear)+'-04-21':String(currentYear)+'-01-01';
-    const filtered=loadDailyEntries().filter(e=>e.date.startsWith(String(currentYear))&&e.date>=cutoff2);
-    if(filtered.length>0&&filtered.some(e=>e.buy)){
-      // labels 기준으로 매핑
-      const buyMap={};
-      filtered.forEach(e=>{ buyMap[e.date.slice(5)]=e.buy||null; });
-      buyArr=labels.map(lbl=>buyMap[lbl]||fixBuy||null);
-    }else{
-      buyArr=labels.map(()=>fixBuy);
-    }
-  }
+  };
 
-  // 계좌별 원금 라인
-  const mkBuyLine = val => val ? labels.map(()=>val) : labels.map(()=>null);
-  let sanBuyArr, naeBuyArr, boyBuyArr;
-  if(currentPeriod==='daily'){
-    const allE = loadDailyEntries();
-    sanBuyArr = allE.some(e=>e.sanBuy) ? allE.map(e=>e.sanBuy||null) : mkBuyLine(SD.sanBuy);
-    naeBuyArr = allE.some(e=>e.naeBuy) ? allE.map(e=>e.naeBuy||null) : mkBuyLine(SD.naeBuy);
-    boyBuyArr = allE.some(e=>e.boyBuy) ? allE.map(e=>e.boyBuy||null) : mkBuyLine(SD.boyBuy);
-  }else{
-    sanBuyArr = mkBuyLine(SD.sanBuy);
-    naeBuyArr = mkBuyLine(SD.naeBuy);
-    boyBuyArr = mkBuyLine(SD.boyBuy);
-  }
+  const buyArr = getDynamicLine('buy', fixBuy);
+  const sanBuyArr = getDynamicLine('sanBuy', SD.sanBuy);
+  const naeBuyArr = getDynamicLine('naeBuy', SD.naeBuy);
+  const boyBuyArr = getDynamicLine('boyBuy', SD.boyBuy);
 
   if(trendChart)trendChart.destroy();
   const ctx=document.getElementById('trend-chart').getContext('2d');
